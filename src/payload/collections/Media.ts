@@ -1,10 +1,19 @@
 import type { CollectionConfig } from 'payload'
+import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { isAuthenticated, isPublic } from '../access'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+const mediaUploadDir = process.env.PAYLOAD_MEDIA_DIR
+  ? path.resolve(process.cwd(), process.env.PAYLOAD_MEDIA_DIR)
+  : path.resolve(process.cwd(), 'public/media')
+
+if (!fs.existsSync(mediaUploadDir)) {
+  fs.mkdirSync(mediaUploadDir, { recursive: true })
+}
 
 function normalizeMediaUrl(url: string | null | undefined): string | null {
   if (!url) return null
@@ -72,8 +81,9 @@ export const Media: CollectionConfig = {
     ],
   },
   upload: {
-    // Store files in public/media — served as static files by Next.js
-    staticDir: path.resolve(dirname, '../../../public/media'),
+    // Store files in a production-configurable media directory.
+    // Use PAYLOAD_MEDIA_DIR in production to point to a persistent volume.
+    staticDir: mediaUploadDir,
     // Disable local storage to ensure files are always written to disk
     disableLocalStorage: false,
     imageSizes: [
