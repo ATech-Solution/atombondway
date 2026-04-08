@@ -33,6 +33,13 @@ import { AboutPage } from './src/payload/globals/AboutPage'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+function envUrl(key: string): string {
+  const suffix = process.env.NODE_ENV === 'production' ? '_PROD' : '_DEV'
+  return process.env[`${key}${suffix}`] || process.env[key] || ''
+}
+
+const siteUrl = envUrl('NEXT_PUBLIC_SITE_URL') || 'http://localhost:3000'
+const payloadServerUrl = envUrl('PAYLOAD_PUBLIC_SERVER_URL') || siteUrl
 
 /**
  * Email transport:
@@ -82,12 +89,14 @@ export default buildConfig({
 
   // CORS & CSRF origins (top-level, not inside admin)
   cors: [
-    process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    payloadServerUrl,
+    siteUrl,
     'http://localhost:3001',
     'http://127.0.0.1:3000',
   ],
   csrf: [
-    process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    payloadServerUrl,
+    siteUrl,
     'http://localhost:3001',
     'http://127.0.0.1:3000',
   ],
@@ -128,7 +137,7 @@ export default buildConfig({
   }),
 
   // Server URL (required for Payload admin to work correctly)
-  serverURL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  serverURL: payloadServerUrl,
 
   // Security
   secret: process.env.PAYLOAD_SECRET || 'CHANGE-THIS-SECRET-IN-PRODUCTION',

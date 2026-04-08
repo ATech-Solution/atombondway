@@ -26,23 +26,40 @@ export function truncate(text: string, maxLength: number): string {
   return text.slice(0, maxLength).trim() + '…'
 }
 
-/**
- * Build the absolute URL for a page (for canonical links and OG tags).
- */
-export function absoluteUrl(path: string): string {
-  const base =
-    process.env.NEXT_PUBLIC_DOMAIN ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    'http://localhost:3000'
-  return `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
+function envUrl(key: string): string | undefined {
+  const suffix = process.env.NODE_ENV === 'production' ? '_PROD' : '_DEV'
+  return process.env[`${key}${suffix}`] || process.env[key]
 }
 
-/**
- * Get the URL for a Payload media item.
- */
+export function getSiteUrl(): string {
+  return (envUrl('NEXT_PUBLIC_SITE_URL') || 'http://localhost:3000').replace(/\/$/, '')
+}
+
+export function getDomainUrl(): string {
+  return (envUrl('NEXT_PUBLIC_DOMAIN') || getSiteUrl()).replace(/\/$/, '')
+}
+
+export function absoluteUrl(path: string): string {
+  const base = getDomainUrl()
+  return `${base}/${path.replace(/^\//, '')}`
+}
+
 export function getMediaUrl(media: { url?: string | null } | null | undefined): string | null {
   if (!media?.url) return null
-  // If the URL is already absolute, return as-is
-  if (media.url.startsWith('http')) return media.url
-  return media.url
+  const url = media.url
+  const base = getSiteUrl()
+
+  if (/^https?:\/\/(localhost|127\.0\.0\.1):3000/.test(url)) {
+    return url.replace(/^https?:\/\/(localhost|127\.0\.0\.1):3000/, base)
+  }
+
+  if (url.startsWith('//')) {
+    return `${base.startsWith('https') ? 'https:' : 'http:'}${url}`
+  }
+
+  if (url.startsWith('/')) {
+    return `${base}${url}`
+  }
+
+  return url
 }

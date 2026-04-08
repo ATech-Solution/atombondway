@@ -4,14 +4,17 @@ import type { NextConfig } from 'next'
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
-// Derive production hostname from NEXT_PUBLIC_SITE_URL if set (e.g. "example.com")
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+function envUrl(key: string): string | undefined {
+  const suffix = process.env.NODE_ENV === 'production' ? '_PROD' : '_DEV'
+  return process.env[`${key}${suffix}`] || process.env[key]
+}
+
+const siteUrl = envUrl('NEXT_PUBLIC_SITE_URL') || 'http://localhost:3000'
 const productionHostname = siteUrl
   ? new URL(siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`).hostname
   : null
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
   productionBrowserSourceMaps: false,
   sassOptions: {
     silenceDeprecations: ['import'],
