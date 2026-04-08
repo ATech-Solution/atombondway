@@ -1,0 +1,304 @@
+/*
+ * Tailwind directives.
+ * preflight is disabled in tailwind.config.ts — no generic element resets
+ * are injected globally, so the Payload Admin UI is not affected.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS variables — safe to be global (admin ignores unknown vars) ── */
+:root {
+  --primary: #034F98;
+  --primary-dark: #023874;
+  --heading: #10242b;
+  --body: #212529;
+  --surface: #f5f5f5;
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   All generic element rules are scoped to .frontend so they never touch
+   the Payload Admin UI (which lives at /admin with its own HTML shell).
+   The <body> inside (frontend)/[locale]/layout.tsx carries className="frontend".
+   ────────────────────────────────────────────────────────────────────────── */
+
+
+body.frontend {
+  margin: 0;
+}
+
+/* Box-sizing reset */
+.frontend *,
+.frontend *::before,
+.frontend *::after {
+  box-sizing: border-box;
+}
+
+/* Smooth scroll */
+.frontend {
+  scroll-behavior: smooth;
+}
+
+/* Body defaults */
+.frontend body,
+.frontend {
+  color: var(--body);
+  /* font-family: var(--font-poppins), 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+  font-size: 19px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  word-wrap: break-word;
+}
+
+/* Images */
+.frontend img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Headings */
+.frontend h1,
+.frontend h2,
+.frontend h3,
+.frontend h4,
+.frontend h5,
+.frontend h6 {
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+/* Paragraphs */
+.frontend p {
+  margin: 0 0 1rem;
+}
+
+/* Links */
+.frontend a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Lists */
+.frontend ul,
+.frontend ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Buttons */
+.frontend button {
+  /* cursor: pointer; */
+  /* background: none; */
+  border: none;
+  /* padding: 0; */
+  /* font: inherit; */
+}
+
+/* ── Header nav links ── */
+.frontend .nav-link {
+  background-color: transparent;
+  color: #3c97eb;
+  font-size: 18px;
+  transition: border-color 0.15s, padding 0.15s;
+  text-transform: uppercase;
+  margin-right: 3px;
+  padding: 5px 15px;
+  border: 1px solid transparent;
+}
+.frontend .nav-link:hover,
+.frontend .nav-link.nav-link--active {
+  color: #3c97eb;
+  border: 1px solid #3c97eb;
+  line-height: 20px;
+}
+
+/* page */
+.frontend .page-title {
+  font-size:clamp(28px, 3.5vw, 43px);
+  color: var(--heading);
+  line-height:1.2;
+  margin-bottom:40px;
+  font-weight: 700;  
+  text-transform: uppercase;
+}
+.frontend .page-sub-title {
+  color: var(--heading);
+  line-height:1.2;
+  font-weight: 700;  
+  text-transform: uppercase;
+  margin: 35px 0 30px 0;
+}
+
+.space-y-12 > :not([hidden]) ~ :not([hidden]){
+  margin:0;
+}
+/* section */
+
+
+/* ── Section title — blue left border ── */
+.frontend .section-title {
+  position: relative;
+  /* padding-left: 16px; */
+}
+.frontend .section-title-light{
+  color:#fff;
+}
+.frontend .section-title::before {
+  display: none;
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  /* width: 4px; */
+  /* background-color: #034F98; */
+  /* border-radius: 2px; */
+}
+
+/* ── Section spacing ── */
+.section-py {
+  @apply py-16 md:py-20;
+}
+
+/* ── Card hover lift ── */
+.card-hover {
+  @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl;
+}
+
+/* ── Pill buttons ── */
+.btn-primary {
+  @apply inline-flex items-center gap-2 bg-[#034F98] text-white font-semibold
+         px-7 py-3 rounded-full hover:bg-[#023874] transition-colors duration-200;
+}
+.btn-outline {
+  @apply inline-flex items-center gap-2 border-2 border-[#034F98] text-[#034F98] font-semibold
+         px-7 py-3 rounded-full hover:bg-[#034F98] hover:text-white transition-colors duration-200;
+}
+
+/* ── Rich text (always used inside .frontend) ── */
+.rich-text h1 { @apply text-3xl font-bold text-[#10242b] mt-8 mb-4; }
+.rich-text h2 { @apply text-2xl font-bold text-[#10242b] mt-6 mb-3; }
+.rich-text h3 { @apply text-xl  font-bold text-[#10242b] mt-5 mb-3; }
+.rich-text p  { @apply mb-4 text-black leading-relaxed;font-size:19px;  }
+.rich-text ul { @apply list-disc pl-6 mb-4 space-y-1;
+  margin: 0 0 24px 14px;
+  line-height: 2; 
+}
+.rich-text ol { @apply list-decimal pl-6 mb-4 space-y-1; }
+.rich-text li { @apply text-gray-700; }
+.rich-text a  { @apply text-[#034F98] hover:text-[#023874] underline; }
+.rich-text strong { @apply font-semibold; }
+.rich-text blockquote {
+  @apply border-l-4 border-[#034F98] pl-4 italic text-gray-600 my-4;
+}
+
+/* ── Rich text on dark background ── */
+.rich-text-light p  { @apply text-white; }
+.rich-text-light li { @apply text-white/80; }
+
+/* ── Smart file/link pills in rich text ── */
+.rt-file-link {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.rt-file-link:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+.frontend .section-sub-title {
+  font-size: 20px;
+}
+
+.frontend .services-section img {
+  object-fit:contain;
+  height: 130px;
+  width: auto;
+}
+
+/* .frontend .about-section{} */
+
+.frontend .text-light{
+  color:#fff;
+}
+.frontend .button-section {
+  /* font-family: Myriad Pro; */
+  @apply inline-block bg-[#3c97eb] text-white text-sm font-bold
+         px-8 py-3 hover:bg-[#3c97eb] transition-colors uppercase;
+  background-color: #3c97eb;
+  border: 1px solid #3c97eb;
+  color: #fff;
+  position: relative;
+  -webkit-transition: 0.5s all;
+  -moz-transition: 0.5s all;
+  -ms-transition: 0.5s all;
+  -o-transition: 0.5s all;
+  transition: 0.5s all;
+}
+
+.frontend .button-section:hover, 
+.frontend .button-section:focus, 
+.frontend .button-section:active {
+    background-color: #3c97eb;
+    color: #fff;
+    padding-left: 60px;
+}
+
+.frontend .button-section:hover:before, 
+.frontend .button-section:focus:before, 
+.frontend .button-section:active:before {
+    width: 30px;
+    opacity: 1;
+}
+.frontend .button-section:before {
+    background-color: #fff;
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    opacity: 1;
+    height: 1px;
+    width: 0;
+    -webkit-transform: translate(0, -50%);
+    -moz-transform: translate(0, -50%);
+    -ms-transform: translate(0, -50%);
+    -o-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    -webkit-transition: 0.5s all;
+    -moz-transition: 0.5s all;
+    -ms-transition: 0.5s all;
+    -o-transition: 0.5s all;
+    transition: 0.5s all;
+}
+
+.frontend .button-hero{
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.frontend footer .footer-top {
+  background-color: #f6f8f9;
+  /* font-size: 16px; */
+}
+.frontend footer .footer-top p {margin: 0;}
+.frontend .footer-copyright{
+  background-color: #f6f8f9;
+  color: #878787;
+  font-size: 14px;
+}
+.frontend .footer-copyright div{
+  border-top: 2px solid #a1a1a1;
+}
+
+/* .frontend .back-to-top{
+  color: #000;
+} */

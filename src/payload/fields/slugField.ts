@@ -1,0 +1,58 @@
+import type { Field } from 'payload'
+
+/**
+ * Converts a string into a URL-safe slug.
+ * Handles ASCII content; returns an empty string for purely non-ASCII input.
+ */
+const formatSlug = (value: string): string =>
+  value
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '')
+    .toLowerCase()
+
+/**
+ * Resolves the raw string from a source field value, which may be:
+ *   - a plain string (single locale)
+ *   - an object keyed by locale (e.g. { en: 'Foo', zh: '...' })
+ *
+ * Prefers the English locale as the canonical basis for slugs so that
+ * bilingual content always produces valid ASCII slugs.
+ */
+const resolveSourceString = (value: unknown): string => {
+  if (typeof value === 'string') return value
+
+  if (value !== null && typeof value === 'object') {
+    const localeMap = value as Record<string, unknown>
+    // Prefer English as the canonical slug source
+    const preferred = localeMap['en'] ?? Object.values(localeMap)[0]
+    return typeof preferred === 'string' ? preferred : ''
+  }
+
+  return ''
+}
+
+export const slugField = (sourceField = 'title'): Field => ({
+  name: 'slug',
+  type: 'text',
+  unique: true,
+  index: true,
+  admin: {
+    position: 'sidebar',
+    description: 'URL-friendly identifier. Auto-generated from the English title if left blank.',
+  },
+  hooks: {
+    beforeValidate: [
+      ({ operation, value, siblingData }) => {
+        const shouldAutoGenerate = operation === 'create' || !value
+        if (!shouldAutoGenerate) return formatSlug(value as string)
+
+        const raw = resolveSourceString(siblingData?.[sourceField])
+        const generated = formatSlug(raw)
+
+        // Fall back to the manually entered value (even unformatted) if
+        // auto-generation produced nothing (e.g. source is Chinese-only).
+        return generated || (value ? formatSlug(value as string) : value)
+      },
+    ],
+  },
+})

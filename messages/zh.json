@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "首頁",
+    "about": "關於我們",
+    "projects": "項目案例",
+    "products": "產品",
+    "services": "服務",
+    "contact": "聯繫我們"
+  },
+  "hero": {
+    "defaultHeading": "歡迎來到我們的公司",
+    "defaultSubheading": "為您的業務提供專業解決方案。",
+    "ctaDefault": "了解更多",
+    "ctaContact": "聯繫我們"
+  },
+  "sections": {
+    "recentProjects": "近期項目",
+    "recentProjectsSubtitle": "探索我們已完成的項目組合",
+    "featuredProducts": "特色產品",
+    "featuredProductsSubtitle": "發掘我們優質產品系列",
+    "ourServices": "我們的服務",
+    "ourServicesSubtitle": "為您量身定制的綜合解決方案",
+    "aboutUs": "關於我們",
+    "contactUs": "聯繫我們"
+  },
+  "footer": {
+    "allRightsReserved": "版權所有。",
+    "quickLinks": "快速鏈接",
+    "contactInfo": "聯繫我們"
+  },
+  "common": {
+    "viewAll": "查看全部",
+    "viewAllProjects": "查看所有項目",
+    "viewAllProducts": "查看所有產品",
+    "learnMore": "了解更多",
+    "readMore": "閱讀更多",
+    "loading": "載入中…",
+    "noData": "暫無資料",
+    "backToHome": "返回首頁",
+    "backToList": "返回列表"
+  },
+  "contact": {
+    "pageTitle": "聯繫我們",
+    "pageSubtitle": "我們很樂意聆聽您的意見，請與我們的團隊取得聯繫。",
+    "formTitle": "發送訊息",
+    "nameLabel": "全名",
+    "namePlaceholder": "您的全名",
+    "emailLabel": "電子郵件地址",
+    "emailPlaceholder": "your@email.com",
+    "phoneLabel": "電話號碼",
+    "phonePlaceholder": "+852 XXXX XXXX",
+    "subjectLabel": "主題",
+    "subjectPlaceholder": "我們能如何幫助您？",
+    "messageLabel": "訊息",
+    "messagePlaceholder": "請告訴我們您的項目或查詢…",
+    "submitButton": "發送訊息",
+    "submitting": "發送中…",
+    "successTitle": "訊息已發送！",
+    "successMessage": "感謝您聯繫我們。我們將在1–2個工作日內回覆您。",
+    "errorMessage": "出現錯誤，請重試或直接發送電子郵件給我們。",
+    "address": "地址",
+    "phone": "電話",
+    "fax": "傳真",
+    "email": "電子郵件",
+    "businessHours": "辦公時間"
+  },
+  "about": {
+    "pageTitle": "關於我們",
+    "pageSubtitle": "了解我們的公司、價值觀和團隊。"
+  },
+  "projects": {
+    "pageTitle": "我們的項目",
+    "pageSubtitle": "瀏覽我們已完成及進行中的項目組合。",
+    "noProjects": "暫無項目。",
+    "category": "類別",
+    "location": "地點",
+    "completionDate": "完工日期"
+  },
+  "products": {
+    "pageTitle": "我們的產品",
+    "pageSubtitle": "探索我們完整的優質產品系列。",
+    "noProducts": "暫無產品。",
+    "category": "類別"
+  },
+  "services": {
+    "pageTitle": "我們的服務",
+    "pageSubtitle": "發掘我們提供的綜合服務。",
+    "noServices": "暫無服務。"
+  },
+  "notFound": {
+    "title": "找不到頁面",
+    "description": "您要尋找的頁面不存在或已被移動。",
+    "backToHome": "返回首頁"
+  }
+}

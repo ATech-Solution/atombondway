@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "projects": "Projects",
+    "products": "Products",
+    "services": "Services",
+    "contact": "Contact"
+  },
+  "hero": {
+    "defaultHeading": "Welcome to Our Company",
+    "defaultSubheading": "Professional solutions for your business needs.",
+    "ctaDefault": "Learn More",
+    "ctaContact": "Contact Us"
+  },
+  "sections": {
+    "recentProjects": "Recent Projects",
+    "recentProjectsSubtitle": "Explore our portfolio of completed projects",
+    "featuredProducts": "Featured Products",
+    "featuredProductsSubtitle": "Discover our range of quality products",
+    "ourServices": "Our Services",
+    "ourServicesSubtitle": "Comprehensive solutions tailored to your needs",
+    "aboutUs": "About Us",
+    "contactUs": "Contact Us"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved.",
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact Us"
+  },
+  "common": {
+    "viewAll": "View All",
+    "viewAllProjects": "View All Projects",
+    "viewAllProducts": "View All Products",
+    "learnMore": "Learn More",
+    "readMore": "Read More",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "backToHome": "Back to Home",
+    "backToList": "Back to List"
+  },
+  "contact": {
+    "pageTitle": "Contact Us",
+    "pageSubtitle": "We would love to hear from you. Get in touch with our team.",
+    "formTitle": "Send Us a Message",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "Your full name",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "your@email.com",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "+1 (555) 000-0000",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "How can we help you?",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us about your project or inquiry...",
+    "submitButton": "Send Message",
+    "submitting": "Sending...",
+    "successTitle": "Message Sent!",
+    "successMessage": "Thank you for contacting us. We will get back to you within 1–2 business days.",
+    "errorMessage": "Something went wrong. Please try again or email us directly.",
+    "address": "Address",
+    "phone": "Phone",
+    "fax": "Fax",
+    "email": "Email",
+    "businessHours": "Business Hours"
+  },
+  "about": {
+    "pageTitle": "About Us",
+    "pageSubtitle": "Learn more about our company, values, and team."
+  },
+  "projects": {
+    "pageTitle": "Our Projects",
+    "pageSubtitle": "Browse our portfolio of completed and ongoing projects.",
+    "noProjects": "No projects found.",
+    "category": "Category",
+    "location": "Location",
+    "completionDate": "Completed"
+  },
+  "products": {
+    "pageTitle": "Our Products",
+    "pageSubtitle": "Explore our full range of quality products.",
+    "noProducts": "No products found.",
+    "category": "Category"
+  },
+  "services": {
+    "pageTitle": "Our Services",
+    "pageSubtitle": "Discover the comprehensive services we offer.",
+    "noServices": "No services found."
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "backToHome": "Back to Home"
+  }
+}

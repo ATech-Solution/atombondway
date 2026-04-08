@@ -1,0 +1,53 @@
+'use client'
+import React from 'react'
+
+const adminStyles = `
+  :root {
+    --color-blue-100: #ddeeff;
+    --color-blue-200: #b3d4f5;
+    --color-blue-300: #7db8ee;
+    --color-blue-400: #4d9de4;
+    --color-blue-500: #3c97eb;
+    --color-blue-600: #034F98;
+    --color-blue-700: #023a70;
+    --color-blue-800: #01254a;
+    --color-blue-900: #001224;
+  }
+
+  .nav {
+    border-right: 1px solid var(--theme-border-color) !important;
+  }
+
+  .btn.btn--style-primary {
+    background-color: #034F98 !important;
+    border-color: #034F98 !important;
+  }
+
+  .btn.btn--style-primary:hover {
+    background-color: #023a70 !important;
+    border-color: #023a70 !important;
+  }
+
+  .nav__link--active {
+    color: #3c97eb !important;
+  }
+
+  .nav__link--active::before {
+    background-color: #3c97eb !important;
+  }
+
+  .template-minimal__wrap {
+    border-top: 3px solid #034F98;
+  }
+`
+
+export function AdminStyleProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: adminStyles }} />
+      {children}
+    </>
+  )
+}
+
+export default AdminStyleProvider
