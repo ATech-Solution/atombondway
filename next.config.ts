@@ -10,11 +10,16 @@ function envUrl(key: string): string | undefined {
 }
 
 const siteUrl = envUrl('NEXT_PUBLIC_SITE_URL') || 'http://localhost:3000'
+const mediaBaseUrl = process.env.NEXT_PUBLIC_MEDIA_URL || siteUrl
 const productionHostname = siteUrl
   ? new URL(siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`).hostname
   : null
+const mediaHostname = mediaBaseUrl
+  ? new URL(mediaBaseUrl.startsWith('http') ? mediaBaseUrl : `https://${mediaBaseUrl}`).hostname
+  : null
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   turbopack: {},
   productionBrowserSourceMaps: false,
   sassOptions: {
@@ -44,6 +49,10 @@ const nextConfig: NextConfig = {
             { protocol: 'https' as const, hostname: productionHostname, pathname: '/api/media/**' },
             { protocol: 'https' as const, hostname: productionHostname, pathname: '/media/**' },
           ]
+        : []),
+      // If a separate media URL is configured, add it as a remote pattern
+      ...(mediaHostname && mediaHostname !== productionHostname
+        ? [{ protocol: 'https' as const, hostname: mediaHostname, pathname: '/media/**' }]
         : []),
     ],
   },
