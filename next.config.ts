@@ -47,12 +47,12 @@ const nextConfig: NextConfig = {
       ...(productionHostname
         ? [
             { protocol: 'https' as const, hostname: productionHostname, pathname: '/api/media/**' },
-            { protocol: 'https' as const, hostname: productionHostname, pathname: '/media/**' },
+            { protocol: 'https' as const, hostname: productionHostname, pathname: '/public/media/**' },
           ]
         : []),
       // If a separate media URL is configured, add it as a remote pattern
       ...(mediaHostname && mediaHostname !== productionHostname
-        ? [{ protocol: 'https' as const, hostname: mediaHostname, pathname: '/media/**' }]
+        ? [{ protocol: 'https' as const, hostname: mediaHostname, pathname: '/public/media/**' }]
         : []),
     ],
   },
