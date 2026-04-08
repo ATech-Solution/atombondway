@@ -5,6 +5,7 @@ import * as migration_20260406_110922 from './20260406_110922';
 import * as migration_20260406_112753 from './20260406_112753';
 import * as migration_20260406_160000 from './20260406_160000';
 import * as migration_20260407_sticky_header from './20260407_sticky_header';
+import * as migration_20260408_104702_fix_media_urls from './20260408_104702_fix_media_urls';
 
 export const migrations = [
   {
@@ -41,5 +42,10 @@ export const migrations = [
     up: migration_20260407_sticky_header.up,
     down: migration_20260407_sticky_header.down,
     name: '20260407_sticky_header',
+  },
+  {
+    up: migration_20260408_104702_fix_media_urls.up,
+    down: migration_20260408_104702_fix_media_urls.down,
+    name: '20260408_104702_fix_media_urls'
   },
 ];

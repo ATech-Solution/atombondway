@@ -15,6 +15,7 @@ const productionHostname = siteUrl
   : null
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   productionBrowserSourceMaps: false,
   sassOptions: {
     silenceDeprecations: ['import'],

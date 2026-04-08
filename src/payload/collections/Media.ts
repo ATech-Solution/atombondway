@@ -6,6 +6,30 @@ import { isAuthenticated, isPublic } from '../access'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+function getRequestSiteUrl(reqSiteUrl?: string): string {
+  return (reqSiteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '')
+}
+
+function normalizeMediaUrl(url: string | null | undefined, siteUrl: string): string | null {
+  if (!url) return null
+
+  const escapedSiteUrl = siteUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  let normalized = url
+    .replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, '')
+    .replace(new RegExp(`^https?:\/\/${escapedSiteUrl}`), '')
+
+  // Convert API URLs to static URLs
+  if (normalized.startsWith('/api/media/file/')) {
+    normalized = normalized.replace('/api/media/file/', '/media/')
+  }
+
+  if (normalized.startsWith('/')) {
+    return normalized
+  }
+
+  return url
+}
+
 export const Media: CollectionConfig = {
   slug: 'media',
   admin: {
@@ -17,6 +41,37 @@ export const Media: CollectionConfig = {
     create: isAuthenticated,
     update: isAuthenticated,
     delete: isAuthenticated,
+  },
+  hooks: {
+    afterRead: [
+      ({ doc, req }) => {
+        if (!doc || typeof doc !== 'object') return doc
+
+        const siteUrl = getRequestSiteUrl(req?.payload?.config?.serverURL)
+
+        if (typeof doc.url === 'string') {
+          // First normalize absolute URLs
+          doc.url = normalizeMediaUrl(doc.url, siteUrl)
+          // Then convert API URLs to static URLs
+          if (doc.url.startsWith('/api/media/file/')) {
+            doc.url = doc.url.replace('/api/media/file/', '/media/')
+          }
+        }
+
+        if (doc.sizes && typeof doc.sizes === 'object') {
+          for (const size of Object.values(doc.sizes)) {
+            if (size && typeof size === 'object' && typeof (size as any).url === 'string') {
+              ;(size as any).url = normalizeMediaUrl((size as any).url, siteUrl)
+              if ((size as any).url.startsWith('/api/media/file/')) {
+                ;(size as any).url = (size as any).url.replace('/api/media/file/', '/media/')
+              }
+            }
+          }
+        }
+
+        return doc
+      },
+    ],
   },
   upload: {
     // Store files in public/media — served as static files by Next.js
