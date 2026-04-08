@@ -15,7 +15,7 @@ const productionHostname = siteUrl
   : null
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  turbopack: {},
   productionBrowserSourceMaps: false,
   sassOptions: {
     silenceDeprecations: ['import'],
@@ -27,8 +27,8 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 64, 128, 256, 384],
     localPatterns: [
-      { pathname: '/media/**',  search: '' },
       { pathname: '/images/**', search: '' },
+      { pathname: '/media/**', search: '' },
     ],
     remotePatterns: [
       // Dev: Payload serves absolute URLs via its API endpoint

@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
+import { getMediaUrl } from '@/lib/utils'
 
 const CATEGORY_LABELS: Record<string, { en: string; zh: string; image: string }> = {
   'silicone-sealants': { en: 'SILICONE SEALANTS', zh: '陶氏密封膠', image: '/images/product-sealants.jpg' },
@@ -45,7 +46,7 @@ export default function FeaturedProductsSection({ products, locale, homePageData
               const slug = item.categorySlug || 'silicone-sealants'
               const catInfo = CATEGORY_LABELS[slug]
               const label = item.label || (loc === 'zh' ? catInfo?.zh : catInfo?.en) || slug
-              const imgSrc = item.image?.url || catInfo?.image || '/images/product-sealants.jpg'
+              const imgSrc = getMediaUrl(item.image) || catInfo?.image || '/images/product-sealants.jpg'
               return (
                 <div key={idx} className="flex flex-col">
                   <Link
@@ -100,7 +101,7 @@ export default function FeaturedProductsSection({ products, locale, homePageData
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {items.slice(0, 3).map((prod: any, idx: number) => {
             const fallbackImgs = ['/images/product-sealants.jpg', '/images/product-tapes.jpg', '/images/product-suction.jpg']
-            const imgSrc = prod.image?.url || prod.image || fallbackImgs[idx] || fallbackImgs[0]
+            const imgSrc = getMediaUrl(prod.image) || prod.image || fallbackImgs[idx] || fallbackImgs[0]
             const name = loc === 'zh' ? (prod.name || prod.nameEn || 'Product') : (prod.nameEn || prod.name || 'Product')
             const slug = prod.slug || '#'
             return (

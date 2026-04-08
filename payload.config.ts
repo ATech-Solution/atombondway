@@ -40,6 +40,8 @@ function envUrl(key: string): string {
 
 const siteUrl = envUrl('NEXT_PUBLIC_SITE_URL') || 'http://localhost:3000'
 const payloadServerUrl = envUrl('PAYLOAD_PUBLIC_SERVER_URL') || siteUrl
+const localDevUrls = ['http://localhost:3000', 'http://127.0.0.1:3000']
+const allowedOrigins = Array.from(new Set([payloadServerUrl, siteUrl, ...localDevUrls]))
 
 /**
  * Email transport:
@@ -88,18 +90,8 @@ export default buildConfig({
   },
 
   // CORS & CSRF origins (top-level, not inside admin)
-  cors: [
-    payloadServerUrl,
-    siteUrl,
-    'http://localhost:3001',
-    'http://127.0.0.1:3000',
-  ],
-  csrf: [
-    payloadServerUrl,
-    siteUrl,
-    'http://localhost:3001',
-    'http://127.0.0.1:3000',
-  ],
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
 
   // Collections & Globals
   collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory, Services],

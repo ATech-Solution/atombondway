@@ -6,28 +6,18 @@ import { isAuthenticated, isPublic } from '../access'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-function getRequestSiteUrl(reqSiteUrl?: string): string {
-  return (reqSiteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '')
-}
-
-function normalizeMediaUrl(url: string | null | undefined, siteUrl: string): string | null {
+function normalizeMediaUrl(url: string | null | undefined): string | null {
   if (!url) return null
 
-  const escapedSiteUrl = siteUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  let normalized = url
-    .replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, '')
-    .replace(new RegExp(`^https?:\/\/${escapedSiteUrl}`), '')
+  // Strip any absolute URL prefix
+  let normalized = url.replace(/^https?:\/\/[^\/]+\//, '/')
 
   // Convert API URLs to static URLs
   if (normalized.startsWith('/api/media/file/')) {
     normalized = normalized.replace('/api/media/file/', '/media/')
   }
 
-  if (normalized.startsWith('/')) {
-    return normalized
-  }
-
-  return url
+  return normalized
 }
 
 export const Media: CollectionConfig = {
@@ -44,27 +34,35 @@ export const Media: CollectionConfig = {
   },
   hooks: {
     afterRead: [
-      ({ doc, req }) => {
+      ({ doc }) => {
         if (!doc || typeof doc !== 'object') return doc
 
-        const siteUrl = getRequestSiteUrl(req?.payload?.config?.serverURL)
-
         if (typeof doc.url === 'string') {
-          // First normalize absolute URLs
-          doc.url = normalizeMediaUrl(doc.url, siteUrl)
-          // Then convert API URLs to static URLs
-          if (doc.url.startsWith('/api/media/file/')) {
-            doc.url = doc.url.replace('/api/media/file/', '/media/')
-          }
+          doc.url = normalizeMediaUrl(doc.url)
         }
 
         if (doc.sizes && typeof doc.sizes === 'object') {
           for (const size of Object.values(doc.sizes)) {
             if (size && typeof size === 'object' && typeof (size as any).url === 'string') {
-              ;(size as any).url = normalizeMediaUrl((size as any).url, siteUrl)
-              if ((size as any).url.startsWith('/api/media/file/')) {
-                ;(size as any).url = (size as any).url.replace('/api/media/file/', '/media/')
-              }
+              ;(size as any).url = normalizeMediaUrl((size as any).url)
+            }
+          }
+        }
+
+        return doc
+      },
+    ],
+    afterChange: [
+      ({ doc }) => {
+        // Ensure URLs are normalized after creation/update
+        if (typeof doc.url === 'string') {
+          doc.url = normalizeMediaUrl(doc.url)
+        }
+
+        if (doc.sizes && typeof doc.sizes === 'object') {
+          for (const size of Object.values(doc.sizes)) {
+            if (size && typeof size === 'object' && typeof (size as any).url === 'string') {
+              ;(size as any).url = normalizeMediaUrl((size as any).url)
             }
           }
         }
@@ -76,30 +74,32 @@ export const Media: CollectionConfig = {
   upload: {
     // Store files in public/media — served as static files by Next.js
     staticDir: path.resolve(dirname, '../../../public/media'),
+    // Disable local storage to ensure files are always written to disk
+    disableLocalStorage: false,
     imageSizes: [
       {
         name: 'thumbnail',
         width: 400,
         height: 300,
-        position: 'centre',
+        position: 'center',
       },
       {
         name: 'card',
         width: 768,
         height: 480,
-        position: 'centre',
+        position: 'center',
       },
       {
         name: 'hero',
         width: 1920,
         height: 1080,
-        position: 'centre',
+        position: 'center',
       },
       {
         name: 'og',
         width: 1200,
         height: 630,
-        position: 'centre',
+        position: 'center',
       },
     ],
     adminThumbnail: 'thumbnail',

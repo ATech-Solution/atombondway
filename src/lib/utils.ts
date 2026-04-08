@@ -47,19 +47,18 @@ export function absoluteUrl(path: string): string {
 export function getMediaUrl(media: { url?: string | null } | null | undefined): string | null {
   if (!media?.url) return null
   const url = media.url
-  const base = getSiteUrl()
 
-  if (/^https?:\/\/(localhost|127\.0\.0\.1):3000/.test(url)) {
-    return url.replace(/^https?:\/\/(localhost|127\.0\.0\.1):3000/, base)
+  // If it's already an absolute URL, return as is
+  if (url.startsWith('http')) {
+    return url
   }
 
-  if (url.startsWith('//')) {
-    return `${base.startsWith('https') ? 'https:' : 'http:'}${url}`
-  }
-
+  // If it's a relative path starting with /, make it absolute
   if (url.startsWith('/')) {
+    const base = getSiteUrl()
     return `${base}${url}`
   }
 
+  // For any other case, return as is
   return url
 }
