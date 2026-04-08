@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "npm run generate:importmap",
+    "postinstall": "npm run generate:types && npm run generate:importmap",
+    "prestart": "npm run build",
     "start": "next start",
+    "start:prod": "npm run build && npm run start",
     "lint": "next lint",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",

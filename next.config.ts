@@ -11,10 +11,11 @@ const productionHostname = siteUrl
   : null
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   productionBrowserSourceMaps: false,
   sassOptions: {
-    // silenceDeprecations: ['import'],
-    silenceDeprecations: ['legacy-js-api'],
+    silenceDeprecations: ['import'],
+    // silenceDeprecations: ['legacy-js-api'],
   },
   images: {
     formats: ['image/avif', 'image/webp'],

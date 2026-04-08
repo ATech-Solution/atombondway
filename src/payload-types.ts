@@ -102,6 +102,7 @@ export interface Config {
     navigation: Navigation;
     'products-page': ProductsPage;
     'projects-page': ProjectsPage;
+    'services-page': ServicesPage;
     'about-page': AboutPage;
     'footer-settings': FooterSetting;
     'custom-css': CustomCss;
@@ -115,6 +116,7 @@ export interface Config {
     navigation: NavigationSelect<false> | NavigationSelect<true>;
     'products-page': ProductsPageSelect<false> | ProductsPageSelect<true>;
     'projects-page': ProjectsPageSelect<false> | ProjectsPageSelect<true>;
+    'services-page': ServicesPageSelect<false> | ServicesPageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'footer-settings': FooterSettingsSelect<false> | FooterSettingsSelect<true>;
     'custom-css': CustomCssSelect<false> | CustomCssSelect<true>;
@@ -1151,6 +1153,61 @@ export interface ProjectsPage {
   createdAt?: string | null;
 }
 /**
+ * Edit the Services page title, intro text, and individual service items (via Collections > Services).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services-page".
+ */
+export interface ServicesPage {
+  id: number;
+  /**
+   * Main heading shown at the top of the Services page.
+   */
+  pageTitle?: string | null;
+  /**
+   * Introductory content below the page title. Supports bold, lists, links, images, etc.
+   */
+  pageSubtitle?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Configure search engine and social media metadata for this content.
+   */
+  meta?: {
+    /**
+     * Page title shown in search results. Recommended: 50–60 characters.
+     */
+    title?: string | null;
+    /**
+     * Summary shown in search results. Recommended: 150–160 characters.
+     */
+    description?: string | null;
+    /**
+     * Comma-separated keywords (optional).
+     */
+    keywords?: string | null;
+    /**
+     * Image shown when shared on social media. Recommended: 1200×630px.
+     */
+    ogImage?: (number | null) | Media;
+    noIndex?: boolean | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Edit the About Us page content.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1510,6 +1567,26 @@ export interface ProductsPageSelect<T extends boolean = true> {
  * via the `definition` "projects-page_select".
  */
 export interface ProjectsPageSelect<T extends boolean = true> {
+  pageTitle?: T;
+  pageSubtitle?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        keywords?: T;
+        ogImage?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services-page_select".
+ */
+export interface ServicesPageSelect<T extends boolean = true> {
   pageTitle?: T;
   pageSubtitle?: T;
   meta?:

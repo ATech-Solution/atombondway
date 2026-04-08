@@ -24,6 +24,7 @@ import { ContactInfo } from './src/payload/globals/ContactInfo'
 import { Navigation } from './src/payload/globals/Navigation'
 import { ProductsPage } from './src/payload/globals/ProductsPage'
 import { ProjectsPage } from './src/payload/globals/ProjectsPage'
+import { ServicesPage } from './src/payload/globals/ServicesPage'
 import { FooterSettings } from './src/payload/globals/FooterSettings'
 import { CustomCSS } from './src/payload/globals/CustomCSS'
 import { HomePage } from './src/payload/globals/HomePage'
@@ -93,7 +94,7 @@ export default buildConfig({
 
   // Collections & Globals
   collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory, Services],
-  globals: [SiteSettings, HeroContent, AboutContent, ContactInfo, Navigation, ProductsPage, ProjectsPage, AboutPage, FooterSettings, CustomCSS, HomePage],
+  globals: [SiteSettings, HeroContent, AboutContent, ContactInfo, Navigation, ProductsPage, ProjectsPage, ServicesPage, AboutPage, FooterSettings, CustomCSS, HomePage],
 
   // Localization: English + Traditional Chinese
   localization: {
@@ -143,7 +144,7 @@ export default buildConfig({
   },
 
   // Image processing (required for thumbnail generation)
-  // sharp,
+  sharp,
 
   // Upload size limit: 10MB
   upload: {
