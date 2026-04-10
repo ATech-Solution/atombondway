@@ -13,6 +13,7 @@ import * as migration_20260410_123009_newsetups from './20260410_123009_newsetup
 import * as migration_20260410_123643_newupdate1 from './20260410_123643_newupdate1';
 import * as migration_20260410_133131 from './20260410_133131';
 import * as migration_20260410_133740_newsetupss from './20260410_133740_newsetupss';
+import * as migration_20260410_154600_newsetupsss from './20260410_154600_newsetupsss';
 
 export const migrations = [
   {
@@ -88,6 +89,11 @@ export const migrations = [
   {
     up: migration_20260410_133740_newsetupss.up,
     down: migration_20260410_133740_newsetupss.down,
-    name: '20260410_133740_newsetupss'
+    name: '20260410_133740_newsetupss',
+  },
+  {
+    up: migration_20260410_154600_newsetupsss.up,
+    down: migration_20260410_154600_newsetupsss.down,
+    name: '20260410_154600_newsetupsss'
   },
 ];

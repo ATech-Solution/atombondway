@@ -23,6 +23,7 @@ export const FooterSettings: GlobalConfig = {
               name: 'title',
               type: 'text',
               label: 'Section Title',
+              localized: true,
             },
             {
               name: 'address',

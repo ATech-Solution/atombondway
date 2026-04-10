@@ -7,7 +7,7 @@
     "build": "next build",
     "postbuild": "npm run generate:importmap",
     "postinstall": "npm run generate:types && npm run generate:importmap",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "start:prod": "npm run build && npm run start",
     "lint": "next lint",
     "generate:types": "NODE_OPTIONS='--import tsx' payload generate:types",
