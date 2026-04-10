@@ -18,7 +18,7 @@ set -e  # stop script if any command fails
 sudo rm -rf .next
 sudo unzip -q next.zip
 sudo mv next .next
-sudo chown -R deploy:deploy .next
+# sudo chown -R deploy:deploy .next
 # sudo chmod -R 755 .next
 sudo rm -rf __MACOSX
 
