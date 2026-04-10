@@ -17,7 +17,7 @@ set -e  # stop script if any command fails
 #prepare .next
 sudo rm -rf .next
 sudo unzip -q next.zip
-#sudo mv next .next
+sudo mv next .next
 sudo rm -rf __MACOSX
 
 echo "📦 Pulling latest code..."
