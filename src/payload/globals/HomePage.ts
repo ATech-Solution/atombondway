@@ -1,13 +1,12 @@
 import type { GlobalConfig } from 'payload'
-import { isAuthenticated, isPublic } from '../access'
-import { seoFields } from '../fields/seoFields'
+import { isAuthenticated, isPublic } from '../access/index.ts'
 
 export const HomePage: GlobalConfig = {
   slug: 'home-page',
   label: 'Home',
   admin: {
     group: 'Pages',
-    description: 'Edit homepage sections. Hero → Content > Hero Section. About → Content > About Section. Services → Collections > Services.',
+    description: 'Edit homepage sections. Hero → Content > Hero Section. Services → Content > Services Section. About → Content > About Section. ',
   },
   access: {
     read: isPublic,
@@ -17,6 +16,59 @@ export const HomePage: GlobalConfig = {
     {
       type: 'tabs',
       tabs: [
+        // ── Hero ──────────────────────────────────────────────
+        {
+          label: 'Hero',
+          description: 'Controls the Hero section on the homepage.',
+          fields: [
+            {
+              name: 'heroSectionTitle',
+              type: 'text',
+              label: 'Section Title',
+              localized: true,
+              defaultValue: 'WE SEAL THE SUCCESS OF HONG KONG',
+            },
+            {
+              name: 'heroSectionBody',
+              type: 'richText',
+              label: 'Content Body',
+              localized: true,
+            },
+            {
+              name: 'heroSectionCtaText',
+              type: 'text',
+              label: 'CTA Button Text',
+              localized: true,
+              defaultValue: 'TELL ME MORE',
+            },
+            {
+              name: 'heroSectionCtaHref',
+              type: 'text',
+              label: 'CTA Button Link',
+              defaultValue: '/about',
+            },
+            {
+              name: 'heroSectionbackgroundImage',
+              type: 'upload',
+              label: 'Background Image',
+              relationTo: 'media',
+              admin: {
+                description: 'Recommended: 1920×1080px or wider. A dark overlay is applied automatically.',
+              },
+            },
+            {
+              name: 'heroSectionoverlayOpacity',
+              type: 'number',
+              label: 'Dark Overlay Opacity (0–100)',
+              defaultValue: 50,
+              min: 0,
+              max: 100,
+              admin: {
+                description: 'Controls the darkness of the overlay on the background image.',
+              },
+            },
+          ],
+        },
         // ── Recent Projects ────────────────────────────────────────────────
         {
           label: 'Recent Projects',
@@ -123,11 +175,133 @@ export const HomePage: GlobalConfig = {
             },
           ],
         },
+        
+        // ── Our Services ──────────────────────────────────────────────
+        {
+          label: 'Our Services',
+          description: 'Controls the Services section on the homepage.',
+          fields: [
+            {
+              name: 'servicesSectionTitle',
+              type: 'text',
+              label: 'Section Title',
+              localized: true,
+              defaultValue: 'OUR SERVICES',
+            },
+            {
+              name: 'servicesSectionCtaText',
+              type: 'text',
+              label: 'CTA Button Text',
+              localized: true,
+              defaultValue: 'VIEW MORE',
+            },
+            {
+              name: 'servicesSectionCtaHref',
+              type: 'text',
+              label: 'CTA Button Link',
+              defaultValue: '/services',
+            },
+            {
+              name: 'servicesSectionHighlights',
+              type: 'array',
+              label: 'Service Highlights',
+              localized: true,
+              admin: {
+                description: 'Key numbers displayed as highlighted service.',
+              },
+              fields: [
+                { name: 'servicesSectionHighlightsTitle', type: 'text', label: 'Title', required: true },
+                { name: 'servicesSectionHighlightsDescription', type: 'textarea', label: 'Description' },
+                {
+                  name: 'servicesSectionHighlightsImage',
+                  type: 'upload',
+                  label: 'Highlight Image',
+                  relationTo: 'media',
+                  admin: {
+                    description: 'Image displayed alongside the highlight.',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        
+        // ── About us ──────────────────────────────────────────────
+        {
+          label: 'About Us',
+          description: 'Controls the About section on the homepage.',
+          fields: [
+            {
+              name: 'aboutSectionTitle',
+              type: 'text',
+              label: 'Section Title',
+              localized: true,
+              defaultValue: 'ABOUT US',
+            },
+            {
+              name: 'aboutSectionBody',
+              type: 'richText',
+              label: 'Content Body',
+              localized: true,
+            },
+            {
+              name: 'aboutSectionCtaText',
+              type: 'text',
+              label: 'CTA Button Text',
+              localized: true,
+              defaultValue: 'VIEW MORE',
+            },
+            {
+              name: 'aboutSectionCtaHref',
+              type: 'text',
+              label: 'CTA Button Link',
+              defaultValue: '/about',
+            },
+          ],
+        },
 
-        // ── SEO ───────────────────────────────────────────────────────────
+        // ── SEO ───────────────────────────────────────────────
         {
           label: 'SEO',
-          fields: seoFields,
+          description: 'Homepage-specific SEO settings. Falls back to General Settings → Default SEO if left empty.',
+          fields: [
+            {
+              name: 'seoTitle',
+              type: 'text',
+              label: 'Meta Title',
+              localized: true,
+              admin: {
+                description: 'Recommended: 50–60 characters. Shown in browser tabs and search results.',
+              },
+            },
+            {
+              name: 'seoDescription',
+              type: 'textarea',
+              label: 'Meta Description',
+              localized: true,
+              admin: {
+                description: 'Recommended: 120–160 characters. Shown under the page title in search results.',
+              },
+            },
+            {
+              name: 'seoKeywords',
+              type: 'text',
+              label: 'Keywords',
+              localized: true,
+              admin: {
+                description: 'Comma-separated keywords (optional).',
+              },
+            },
+            {
+              name: 'seoOgImage',
+              type: 'upload',
+              label: 'Social Share Image (OG Image)',
+              relationTo: 'media',
+              admin: {
+                description: 'Recommended: 1200×630px. Used when the page is shared on social media.',
+              },
+            },
+          ],
         },
       ],
     },

@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { getLocale } from 'next-intl/server'
 import { Poppins } from 'next/font/google'
-import '@/app/globals.css'
+// import '@/app/globals.css'
+import '../globals.css'
 
 /**
  * Root layout for the entire frontend group.

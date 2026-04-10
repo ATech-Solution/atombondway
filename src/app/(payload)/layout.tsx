@@ -6,7 +6,7 @@ import configPromise from '@payload-config'
 import React from 'react'
 import '@payloadcms/next/css'  // Payload admin UI styles (240KB, required)
 import '@/styles/admin.scss'   // Custom brand overrides (loads after, so it wins)
-
+import './custom.css'          // Custom styles for the admin UI (optional)
 
 type Args = {
   children: React.ReactNode

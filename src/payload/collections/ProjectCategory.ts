@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
-import { isAuthenticated, isPublic } from '../access'
-import { slugField } from '../fields/slugField'
+import { isAuthenticated, isPublic } from '../access/index.ts'
+import { slugField } from '../fields/slugField.ts'
 
 export const ProjectCategory: CollectionConfig = {
   slug: 'project-categories',

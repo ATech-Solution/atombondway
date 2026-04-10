@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
-import { isAuthenticated, isPublic } from '../access'
-import { seoFields } from '../fields/seoFields'
-import { slugField } from '../fields/slugField'
+import { isAuthenticated, isPublic } from '../access/index.ts'
+import { seoFields } from '../fields/seoFields.ts'
+import { slugField } from '../fields/slugField.ts'
 
 export const Products: CollectionConfig = {
   slug: 'products',

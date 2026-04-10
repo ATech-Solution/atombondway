@@ -9,7 +9,7 @@ import RecentProjectsSection from '@/components/sections/RecentProjectsSection'
 import FeaturedProductsSection from '@/components/sections/FeaturedProductsSection'
 import ServicesSection from '@/components/sections/ServicesSection'
 import AboutSection from '@/components/sections/AboutSection'
-import ContactSection from '@/components/sections/ContactSection'
+// import ContactSection from '@/components/sections/ContactSection'
 
 type Props = { params: Promise<{ locale: string }> }
 
@@ -18,22 +18,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const payload = await getPayloadClient()
   const payloadLocale = locale as 'en' | 'zh'
 
-  const [hero, homePage, siteSettings] = await Promise.all([
-    payload.findGlobal({ slug: 'hero-content', locale: payloadLocale }).catch(() => null),
+  const [homePage, siteSettings] = await Promise.all([
     payload.findGlobal({ slug: 'home-page', locale: payloadLocale }).catch(() => null),
     payload.findGlobal({ slug: 'site-settings', locale: payloadLocale }).catch(() => null),
   ])
 
-  // SEO: prefer home-page global meta, then hero meta, then site defaults
-  const meta = (homePage as any)?.meta || (hero as any)?.meta
+  // SEO priority: homepage SEO fields → site defaultMeta → companyName fallback
+  const pageSeo = homePage as any
   const defaultMeta = (siteSettings as any)?.defaultMeta
-  const title = meta?.title || defaultMeta?.title || (siteSettings as any)?.companyName || 'Company Profile'
-  const description = meta?.description || defaultMeta?.description || ''
+  const companyName = (siteSettings as any)?.companyName || 'Company'
+
+  const title = pageSeo?.seoTitle || defaultMeta?.title || companyName
+  const description = pageSeo?.seoDescription || defaultMeta?.description || ''
+  const keywords = pageSeo?.seoKeywords || defaultMeta?.keywords
+  const ogImageUrl = pageSeo?.seoOgImage?.url || defaultMeta?.ogImage?.url
+  const noindex = (siteSettings as any)?.noindex === true
 
   return {
     title,
     description,
-    keywords: meta?.keywords || defaultMeta?.keywords,
+    keywords,
+    robots: noindex ? 'noindex, nofollow' : 'index, follow',
     alternates: {
       canonical: absoluteUrl(locale === 'en' ? '/' : `/${locale}`),
       languages: {
@@ -44,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      images: meta?.ogImage?.url ? [meta.ogImage.url] : [],
+      images: ogImageUrl ? [ogImageUrl] : [],
     },
   }
 }
@@ -57,8 +62,7 @@ export default async function HomePageRoute({ params }: Props) {
   const payloadLocale = locale as 'en' | 'zh'
 
   // Fetch all homepage content in parallel
-  const [hero, homePage, projectsResult, productsResult, servicesResult, about, contactInfo] = await Promise.all([
-    payload.findGlobal({ slug: 'hero-content', locale: payloadLocale }).catch(() => null),
+  const [homePage, projectsResult, productsResult] = await Promise.all([
     payload.findGlobal({ slug: 'home-page', locale: payloadLocale }).catch(() => null),
     payload
       .find({
@@ -78,21 +82,14 @@ export default async function HomePageRoute({ params }: Props) {
         locale: payloadLocale,
       })
       .catch(() => ({ docs: [] })),
-    payload
-      .find({
-        collection: 'services',
-        limit: 4,
-        sort: 'order',
-        locale: payloadLocale,
-      })
-      .catch(() => ({ docs: [] })),
-    payload.findGlobal({ slug: 'about-content', locale: payloadLocale }).catch(() => null),
-    payload.findGlobal({ slug: 'contact-info', locale: payloadLocale }).catch(() => null),
   ])
 
   return (
     <>
-      <HeroSection data={hero} />
+      <HeroSection 
+        locale={locale}
+        homePageData={homePage}
+      />
       <RecentProjectsSection
         projects={projectsResult.docs}
         locale={locale}
@@ -103,8 +100,14 @@ export default async function HomePageRoute({ params }: Props) {
         locale={locale}
         homePageData={homePage}
       />
-      <ServicesSection services={servicesResult.docs} locale={locale} homePageData={homePage} />
-      <AboutSection data={{ ...about, _locale: locale }} homePageData={homePage} />
+      <ServicesSection 
+        locale={locale} 
+        homePageData={homePage} 
+      />
+      <AboutSection 
+        locale={locale} 
+        homePageData={homePage} 
+      />
       {/* <ContactSection data={contactInfo} locale={locale} /> */}
     </>
   )

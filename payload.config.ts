@@ -9,26 +9,29 @@ import sharp from 'sharp'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { Users } from './src/payload/collections/Users'
-import { Media } from './src/payload/collections/Media'
-import { Projects } from './src/payload/collections/Projects'
-import { ProjectCategory } from './src/payload/collections/ProjectCategory'
-import { Products } from './src/payload/collections/Products'
-import { ProductCategory } from './src/payload/collections/ProductCategory'
-import { Services } from './src/payload/collections/Services'
+import { Users } from './src/payload/collections/Users.ts'
+import { Media } from './src/payload/collections/Media.ts'
+import { Projects } from './src/payload/collections/Projects.ts'
+import { ProjectCategory } from './src/payload/collections/ProjectCategory.ts'
+import { Products } from './src/payload/collections/Products.ts'
+import { ProductCategory } from './src/payload/collections/ProductCategory.ts'
+// import { Services } from './src/payload/collections/Services.ts'
 
-import { SiteSettings } from './src/payload/globals/SiteSettings'
-import { HeroContent } from './src/payload/globals/HeroContent'
-import { AboutContent } from './src/payload/globals/AboutContent'
-import { ContactInfo } from './src/payload/globals/ContactInfo'
-import { Navigation } from './src/payload/globals/Navigation'
-import { ProductsPage } from './src/payload/globals/ProductsPage'
-import { ProjectsPage } from './src/payload/globals/ProjectsPage'
-import { ServicesPage } from './src/payload/globals/ServicesPage'
-import { FooterSettings } from './src/payload/globals/FooterSettings'
-import { CustomCSS } from './src/payload/globals/CustomCSS'
-import { HomePage } from './src/payload/globals/HomePage'
-import { AboutPage } from './src/payload/globals/AboutPage'
+import { Navigation } from './src/payload/globals/Navigation.ts'
+import { SiteSettings } from './src/payload/globals/SiteSettings.ts'
+// import { HeroContent } from './src/payload/globals/HeroContent.ts'
+// import { AboutContent } from './src/payload/globals/AboutContent.ts'
+// import { ContactInfo } from './src/payload/globals/ContactInfo.ts'
+import { FooterSettings } from './src/payload/globals/FooterSettings.ts'
+import { CustomCSS } from './src/payload/globals/CustomCSS.ts'
+
+import { HomePage } from './src/payload/globals/HomePage.ts'
+import { ProductsPage } from './src/payload/globals/ProductsPage.ts'
+import { ProjectsPage } from './src/payload/globals/ProjectsPage.ts'
+import { ServicesPage } from './src/payload/globals/ServicesPage.ts'
+import { AboutPage } from './src/payload/globals/AboutPage.ts'
+
+
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -94,8 +97,10 @@ export default buildConfig({
   csrf: allowedOrigins,
 
   // Collections & Globals
-  collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory, Services],
-  globals: [SiteSettings, HeroContent, AboutContent, ContactInfo, Navigation, ProductsPage, ProjectsPage, ServicesPage, AboutPage, FooterSettings, CustomCSS, HomePage],
+  // collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory, Services],
+  // globals: [SiteSettings, HeroContent, AboutContent, ContactInfo, Navigation, ProductsPage, ProjectsPage, ServicesPage, AboutPage, FooterSettings, CustomCSS, HomePage],
+  collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory],
+  globals: [SiteSettings, Navigation, HomePage, ProductsPage, ProjectsPage, ServicesPage, AboutPage, FooterSettings, CustomCSS],
 
   // Localization: English + Traditional Chinese
   localization: {

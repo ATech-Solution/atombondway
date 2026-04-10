@@ -73,7 +73,6 @@ export interface Config {
     'project-categories': ProjectCategory;
     products: Product;
     'product-categories': ProductCategory;
-    services: Service;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -86,7 +85,6 @@ export interface Config {
     'project-categories': ProjectCategoriesSelect<false> | ProjectCategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
-    services: ServicesSelect<false> | ServicesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -96,31 +94,25 @@ export interface Config {
   };
   globals: {
     'site-settings': SiteSetting;
-    'hero-content': HeroContent;
-    'about-content': AboutContent;
-    'contact-info': ContactInfo;
     navigation: Navigation;
+    'home-page': HomePage;
     'products-page': ProductsPage;
     'projects-page': ProjectsPage;
     'services-page': ServicesPage;
     'about-page': AboutPage;
     'footer-settings': FooterSetting;
     'custom-css': CustomCss;
-    'home-page': HomePage;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-    'hero-content': HeroContentSelect<false> | HeroContentSelect<true>;
-    'about-content': AboutContentSelect<false> | AboutContentSelect<true>;
-    'contact-info': ContactInfoSelect<false> | ContactInfoSelect<true>;
     navigation: NavigationSelect<false> | NavigationSelect<true>;
+    'home-page': HomePageSelect<false> | HomePageSelect<true>;
     'products-page': ProductsPageSelect<false> | ProductsPageSelect<true>;
     'projects-page': ProjectsPageSelect<false> | ProjectsPageSelect<true>;
     'services-page': ServicesPageSelect<false> | ServicesPageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'footer-settings': FooterSettingsSelect<false> | FooterSettingsSelect<true>;
     'custom-css': CustomCssSelect<false> | CustomCssSelect<true>;
-    'home-page': HomePageSelect<false> | HomePageSelect<true>;
   };
   locale: 'en' | 'zh';
   user: User & {
@@ -434,72 +426,6 @@ export interface ProductCategory {
   createdAt: string;
 }
 /**
- * Manage services displayed in the Services section.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services".
- */
-export interface Service {
-  id: number;
-  title: string;
-  /**
-   * URL-friendly identifier. Auto-generated from the English title if left blank.
-   */
-  slug?: string | null;
-  /**
-   * Brief description shown in the services grid (2–3 sentences).
-   */
-  shortDescription?: string | null;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Lucide icon name (e.g. "wrench", "shield-check", "file-check", "award"). Browse icons at lucide.dev.
-   */
-  icon?: string | null;
-  image?: (number | null) | Media;
-  /**
-   * Lower numbers appear first.
-   */
-  order?: number | null;
-  /**
-   * Configure search engine and social media metadata for this content.
-   */
-  meta?: {
-    /**
-     * Page title shown in search results. Recommended: 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * Summary shown in search results. Recommended: 150–160 characters.
-     */
-    description?: string | null;
-    /**
-     * Comma-separated keywords (optional).
-     */
-    keywords?: string | null;
-    /**
-     * Image shown when shared on social media. Recommended: 1200×630px.
-     */
-    ogImage?: (number | null) | Media;
-    noIndex?: boolean | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
@@ -529,10 +455,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'product-categories';
         value: number | ProductCategory;
-      } | null)
-    | ({
-        relationTo: 'services';
-        value: number | Service;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -754,30 +676,6 @@ export interface ProductCategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services_select".
- */
-export interface ServicesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  shortDescription?: T;
-  description?: T;
-  icon?: T;
-  image?: T;
-  order?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        keywords?: T;
-        ogImage?: T;
-        noIndex?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -865,180 +763,6 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
- * Manage the hero (banner) section shown at the top of the homepage.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "hero-content".
- */
-export interface HeroContent {
-  id: number;
-  heading: string;
-  subheading?: string | null;
-  ctaPrimary?: {
-    text?: string | null;
-    href?: string | null;
-  };
-  /**
-   * Recommended: 1920×1080px or wider. A dark overlay is applied automatically.
-   */
-  backgroundImage?: (number | null) | Media;
-  /**
-   * Controls the darkness of the overlay on the background image.
-   */
-  overlayOpacity?: number | null;
-  /**
-   * Configure search engine and social media metadata for this content.
-   */
-  meta?: {
-    /**
-     * Page title shown in search results. Recommended: 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * Summary shown in search results. Recommended: 150–160 characters.
-     */
-    description?: string | null;
-    /**
-     * Comma-separated keywords (optional).
-     */
-    keywords?: string | null;
-    /**
-     * Image shown when shared on social media. Recommended: 1200×630px.
-     */
-    ogImage?: (number | null) | Media;
-    noIndex?: boolean | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Manage the About Us page and homepage About section content.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "about-content".
- */
-export interface AboutContent {
-  id: number;
-  /**
-   * Small text shown above the heading (e.g. "About Us").
-   */
-  sectionLabel?: string | null;
-  heading?: string | null;
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Image displayed alongside the about text.
-   */
-  image?: (number | null) | Media;
-  /**
-   * Key numbers displayed as highlighted stats (e.g. "20+ Years Experience").
-   */
-  stats?:
-    | {
-        value: string;
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  highlights?:
-    | {
-        title: string;
-        description?: string | null;
-        /**
-         * Lucide icon name (e.g. "check-circle", "star")
-         */
-        icon?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Configure search engine and social media metadata for this content.
-   */
-  meta?: {
-    /**
-     * Page title shown in search results. Recommended: 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * Summary shown in search results. Recommended: 150–160 characters.
-     */
-    description?: string | null;
-    /**
-     * Comma-separated keywords (optional).
-     */
-    keywords?: string | null;
-    /**
-     * Image shown when shared on social media. Recommended: 1200×630px.
-     */
-    ogImage?: (number | null) | Media;
-    noIndex?: boolean | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Company contact details shown in the footer and contact page.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contact-info".
- */
-export interface ContactInfo {
-  id: number;
-  address?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  fax?: string | null;
-  /**
-   * e.g. Mon–Fri: 9:00am – 6:00pm
-   */
-  businessHours?: string | null;
-  /**
-   * Go to Google Maps → Share → Embed a map → Copy only the src="..." URL from the iframe code.
-   */
-  mapEmbedUrl?: string | null;
-  /**
-   * Display the contact form on the Contact page.
-   */
-  contactFormEnabled?: boolean | null;
-  /**
-   * Configure search engine and social media metadata for this content.
-   */
-  meta?: {
-    /**
-     * Page title shown in search results. Recommended: 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * Summary shown in search results. Recommended: 150–160 characters.
-     */
-    description?: string | null;
-    /**
-     * Comma-separated keywords (optional).
-     */
-    keywords?: string | null;
-    /**
-     * Image shown when shared on social media. Recommended: 1200×630px.
-     */
-    ogImage?: (number | null) | Media;
-    noIndex?: boolean | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
  * Manage the main site navigation links.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1067,6 +791,114 @@ export interface Navigation {
         id?: string | null;
       }[]
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Edit homepage sections. Hero → Content > Hero Section. Services → Content > Services Section. About → Content > About Section.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-page".
+ */
+export interface HomePage {
+  id: number;
+  heroSectionTitle?: string | null;
+  heroSectionBody?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  heroSectionCtaText?: string | null;
+  heroSectionCtaHref?: string | null;
+  /**
+   * Recommended: 1920×1080px or wider. A dark overlay is applied automatically.
+   */
+  heroSectionbackgroundImage?: (number | null) | Media;
+  /**
+   * Controls the darkness of the overlay on the background image.
+   */
+  heroSectionoverlayOpacity?: number | null;
+  /**
+   * Small uppercase text above the section title.
+   */
+  projectsSectionLabel?: string | null;
+  projectsSectionTitle?: string | null;
+  projectsCtaText?: string | null;
+  projectsCtaHref?: string | null;
+  featuredProductsTitle?: string | null;
+  featuredProductsMode?: ('featured_products' | 'category_links') | null;
+  /**
+   * Configure up to 4 product category cards to display. Only used when Option 2 is selected.
+   */
+  featuredCategoryLinks?:
+    | {
+        categorySlug: 'silicone-sealants' | 'spacer-tapes' | 'suction-grip' | 'backer-rod';
+        label?: string | null;
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  servicesSectionTitle?: string | null;
+  servicesSectionCtaText?: string | null;
+  servicesSectionCtaHref?: string | null;
+  /**
+   * Key numbers displayed as highlighted service.
+   */
+  servicesSectionHighlights?:
+    | {
+        servicesSectionHighlightsTitle: string;
+        servicesSectionHighlightsDescription?: string | null;
+        /**
+         * Image displayed alongside the highlight.
+         */
+        servicesSectionHighlightsImage?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  aboutSectionTitle?: string | null;
+  aboutSectionBody?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  aboutSectionCtaText?: string | null;
+  aboutSectionCtaHref?: string | null;
+  /**
+   * Recommended: 50–60 characters. Shown in browser tabs and search results.
+   */
+  seoTitle?: string | null;
+  /**
+   * Recommended: 120–160 characters. Shown under the page title in search results.
+   */
+  seoDescription?: string | null;
+  /**
+   * Comma-separated keywords (optional).
+   */
+  seoKeywords?: string | null;
+  /**
+   * Recommended: 1200×630px. Used when the page is shared on social media.
+   */
+  seoOgImage?: (number | null) | Media;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1182,6 +1014,37 @@ export interface ServicesPage {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Key numbers displayed as highlighted service.
+   */
+  values?:
+    | {
+        name: string;
+        /**
+         * Image displayed alongside the value.
+         */
+        logo?: (number | null) | Media;
+        /**
+         * Value description content. Supports bold, lists, links, images, etc.
+         */
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Configure search engine and social media metadata for this content.
    */
@@ -1311,6 +1174,23 @@ export interface AboutPage {
  */
 export interface FooterSetting {
   id: number;
+  title?: string | null;
+  address?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  fax?: string | null;
+  /**
+   * e.g. Mon–Fri: 9:00am – 6:00pm
+   */
+  businessHours?: string | null;
+  /**
+   * Go to Google Maps → Share → Embed a map → Copy only the src="..." URL from the iframe code.
+   */
+  mapEmbedUrl?: string | null;
+  /**
+   * Display the contact form on the Contact page.
+   */
+  contactFormEnabled?: boolean | null;
   /**
    * Display address, phone, email and fax from Layout > Contact Information in the footer top section.
    */
@@ -1338,59 +1218,6 @@ export interface CustomCss {
    * Write valid CSS here. It will be injected into a <style> tag on every page. Use carefully — bad CSS can break the layout.
    */
   css?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Edit homepage sections. Hero → Content > Hero Section. About → Content > About Section. Services → Collections > Services.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "home-page".
- */
-export interface HomePage {
-  id: number;
-  /**
-   * Small uppercase text above the section title.
-   */
-  projectsSectionLabel?: string | null;
-  projectsSectionTitle?: string | null;
-  projectsCtaText?: string | null;
-  projectsCtaHref?: string | null;
-  featuredProductsTitle?: string | null;
-  featuredProductsMode?: ('featured_products' | 'category_links') | null;
-  /**
-   * Configure up to 4 product category cards to display. Only used when Option 2 is selected.
-   */
-  featuredCategoryLinks?:
-    | {
-        categorySlug: 'silicone-sealants' | 'spacer-tapes' | 'suction-grip' | 'backer-rod';
-        label?: string | null;
-        image?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Configure search engine and social media metadata for this content.
-   */
-  meta?: {
-    /**
-     * Page title shown in search results. Recommended: 50–60 characters.
-     */
-    title?: string | null;
-    /**
-     * Summary shown in search results. Recommended: 150–160 characters.
-     */
-    description?: string | null;
-    /**
-     * Comma-separated keywords (optional).
-     */
-    keywords?: string | null;
-    /**
-     * Image shown when shared on social media. Recommended: 1200×630px.
-     */
-    ogImage?: (number | null) | Media;
-    noIndex?: boolean | null;
-  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1430,96 +1257,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "hero-content_select".
- */
-export interface HeroContentSelect<T extends boolean = true> {
-  heading?: T;
-  subheading?: T;
-  ctaPrimary?:
-    | T
-    | {
-        text?: T;
-        href?: T;
-      };
-  backgroundImage?: T;
-  overlayOpacity?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        keywords?: T;
-        ogImage?: T;
-        noIndex?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "about-content_select".
- */
-export interface AboutContentSelect<T extends boolean = true> {
-  sectionLabel?: T;
-  heading?: T;
-  body?: T;
-  image?: T;
-  stats?:
-    | T
-    | {
-        value?: T;
-        label?: T;
-        id?: T;
-      };
-  highlights?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        icon?: T;
-        id?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        keywords?: T;
-        ogImage?: T;
-        noIndex?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contact-info_select".
- */
-export interface ContactInfoSelect<T extends boolean = true> {
-  address?: T;
-  email?: T;
-  phone?: T;
-  fax?: T;
-  businessHours?: T;
-  mapEmbedUrl?: T;
-  contactFormEnabled?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        keywords?: T;
-        ogImage?: T;
-        noIndex?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "navigation_select".
  */
 export interface NavigationSelect<T extends boolean = true> {
@@ -1538,6 +1275,54 @@ export interface NavigationSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-page_select".
+ */
+export interface HomePageSelect<T extends boolean = true> {
+  heroSectionTitle?: T;
+  heroSectionBody?: T;
+  heroSectionCtaText?: T;
+  heroSectionCtaHref?: T;
+  heroSectionbackgroundImage?: T;
+  heroSectionoverlayOpacity?: T;
+  projectsSectionLabel?: T;
+  projectsSectionTitle?: T;
+  projectsCtaText?: T;
+  projectsCtaHref?: T;
+  featuredProductsTitle?: T;
+  featuredProductsMode?: T;
+  featuredCategoryLinks?:
+    | T
+    | {
+        categorySlug?: T;
+        label?: T;
+        image?: T;
+        id?: T;
+      };
+  servicesSectionTitle?: T;
+  servicesSectionCtaText?: T;
+  servicesSectionCtaHref?: T;
+  servicesSectionHighlights?:
+    | T
+    | {
+        servicesSectionHighlightsTitle?: T;
+        servicesSectionHighlightsDescription?: T;
+        servicesSectionHighlightsImage?: T;
+        id?: T;
+      };
+  aboutSectionTitle?: T;
+  aboutSectionBody?: T;
+  aboutSectionCtaText?: T;
+  aboutSectionCtaHref?: T;
+  seoTitle?: T;
+  seoDescription?: T;
+  seoKeywords?: T;
+  seoOgImage?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1589,6 +1374,14 @@ export interface ProjectsPageSelect<T extends boolean = true> {
 export interface ServicesPageSelect<T extends boolean = true> {
   pageTitle?: T;
   pageSubtitle?: T;
+  values?:
+    | T
+    | {
+        name?: T;
+        logo?: T;
+        description?: T;
+        id?: T;
+      };
   meta?:
     | T
     | {
@@ -1640,6 +1433,14 @@ export interface AboutPageSelect<T extends boolean = true> {
  * via the `definition` "footer-settings_select".
  */
 export interface FooterSettingsSelect<T extends boolean = true> {
+  title?: T;
+  address?: T;
+  email?: T;
+  phone?: T;
+  fax?: T;
+  businessHours?: T;
+  mapEmbedUrl?: T;
+  contactFormEnabled?: T;
   showContactInfo?: T;
   copyrightText?: T;
   showBackToTop?: T;
@@ -1653,38 +1454,6 @@ export interface FooterSettingsSelect<T extends boolean = true> {
  */
 export interface CustomCssSelect<T extends boolean = true> {
   css?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "home-page_select".
- */
-export interface HomePageSelect<T extends boolean = true> {
-  projectsSectionLabel?: T;
-  projectsSectionTitle?: T;
-  projectsCtaText?: T;
-  projectsCtaHref?: T;
-  featuredProductsTitle?: T;
-  featuredProductsMode?: T;
-  featuredCategoryLinks?:
-    | T
-    | {
-        categorySlug?: T;
-        label?: T;
-        image?: T;
-        id?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        keywords?: T;
-        ogImage?: T;
-        noIndex?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

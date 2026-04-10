@@ -10,11 +10,11 @@
     "start": "next start",
     "start:prod": "npm run build && npm run start",
     "lint": "next lint",
-    "generate:types": "payload generate:types",
-    "generate:importmap": "payload generate:importmap",
-    "payload": "payload",
-    "migrate:create": "payload migrate:create",
-    "migrate": "payload migrate"
+    "generate:types": "NODE_OPTIONS='--import tsx' payload generate:types",
+    "generate:importmap": "NODE_OPTIONS='--import tsx' payload generate:importmap",
+    "payload": "NODE_OPTIONS='--import tsx' payload",
+    "migrate:create": "NODE_OPTIONS='--import tsx' payload migrate:create",
+    "migrate": "NODE_OPTIONS='--import tsx' payload migrate"
   },
   "dependencies": {
     "@payloadcms/db-sqlite": "3.33.0",
@@ -32,7 +32,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "server-only": "^0.0.1",
-    "sharp": "^0.33.0"
+    "sharp": "^0.33.0",
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

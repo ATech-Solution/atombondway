@@ -1,6 +1,6 @@
 import type { GlobalConfig } from 'payload'
-import { isAuthenticated, isPublic } from '../access'
-import { seoFields } from '../fields/seoFields'
+import { isAuthenticated, isPublic } from '../access/index.ts'
+import { seoFields } from '../fields/seoFields.ts'
 
 export const ServicesPage: GlobalConfig = {
   slug: 'services-page',
@@ -25,7 +25,7 @@ export const ServicesPage: GlobalConfig = {
               type: 'text',
               label: 'Page Title',
               localized: true,
-              defaultValue: 'Our Services',
+              defaultValue: 'Who We Are',
               admin: {
                 description: 'Main heading shown at the top of the Services page.',
               },
@@ -38,6 +38,40 @@ export const ServicesPage: GlobalConfig = {
               admin: {
                 description: 'Introductory content below the page title. Supports bold, lists, links, images, etc.',
               },
+            },
+            {
+              name: 'values',
+              type: 'array',
+              label: 'Value Services',
+              localized: true,
+              admin: {
+                description: 'Key numbers displayed as highlighted service.',
+              },
+              fields: [
+                {
+                  name: 'name',
+                  type: 'text',
+                  label: 'Value Name',
+                  required: true,
+                },
+                {
+                  name: 'logo',
+                  type: 'upload',
+                  label: 'Value Image',
+                  relationTo: 'media',
+                  admin: {
+                    description: 'Image displayed alongside the value.',
+                  },
+                },
+                {
+                  name: 'description',
+                  type: 'richText',
+                  label: 'Value Description',
+                  admin: {
+                    description: 'Value description content. Supports bold, lists, links, images, etc.',
+                  },
+                },
+              ],
             },
           ],
         },

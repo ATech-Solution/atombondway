@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { isAuthenticated, isPublic } from '../access'
+import { isAuthenticated, isPublic } from '../access/index.ts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -81,9 +81,8 @@ export const Media: CollectionConfig = {
     ],
   },
   upload: {
-    // Store files in a production-configurable media directory.
-    // Use PAYLOAD_MEDIA_DIR in production to point to a persistent volume.
-    staticDir: mediaUploadDir,
+    // Store files in public/media — served as static files by Next.js
+    staticDir: path.resolve(dirname, '../../../public/media'),
     // Disable local storage to ensure files are always written to disk
     disableLocalStorage: false,
     imageSizes: [

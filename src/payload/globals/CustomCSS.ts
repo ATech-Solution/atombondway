@@ -1,5 +1,5 @@
 import type { GlobalConfig } from 'payload'
-import { isAdmin, isPublic } from '../access'
+import { isAdmin, isPublic } from '../access/index.ts'
 
 export const CustomCSS: GlobalConfig = {
   slug: 'custom-css',

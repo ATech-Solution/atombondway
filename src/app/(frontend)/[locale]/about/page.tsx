@@ -14,11 +14,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
   const payload = await getPayloadClient()
   const loc = locale as 'en' | 'zh'
-  const [aboutPage, aboutContent] = await Promise.all([
+  const [aboutPage] = await Promise.all([
     payload.findGlobal({ slug: 'about-page', locale: loc }).catch(() => null),
-    payload.findGlobal({ slug: 'about-content', locale: loc }).catch(() => null),
   ])
-  const meta = (aboutPage as any)?.meta || (aboutContent as any)?.meta
+  const meta = (aboutPage as any)?.meta || []
+    // (aboutContent as any)?.meta
   return {
     title: meta?.title || (loc === 'zh' ? '關於我們 | 力新邦威' : 'About Us | Atom Bondway'),
     description: meta?.description || (loc === 'zh'
@@ -32,10 +32,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const DEFAULT_PARTNERS = [
-  { name: 'Dow',              logoUrl: '/images/partners/dow-logo.png' },
-  { name: 'Saint-Gobain',     logoUrl: '/images/partners/saint-gobain-logo.png' },
-  { name: "Wood's Powr-Grip", logoUrl: '/images/partners/woods-powr-grip-logo.png' },
-  { name: 'Intelli-Grip',     logoUrl: '/images/partners/intelli-grip-logo.jpg' },
+  // { name: 'Dow',              logoUrl: '/images/partners/dow-logo.png' },
+  // { name: 'Saint-Gobain',     logoUrl: '/images/partners/saint-gobain-logo.png' },
+  // { name: "Wood's Powr-Grip", logoUrl: '/images/partners/woods-powr-grip-logo.png' },
+  // { name: 'Intelli-Grip',     logoUrl: '/images/partners/intelli-grip-logo.jpg' },
 ]
 
 // Helper: check if a richText field has actual content
@@ -59,10 +59,10 @@ export default async function AboutPage({ params }: Props) {
   const missionTitle  = aboutPage?.missionTitle || (isZh ? '宗旨' : 'Mission')
   const missionBody   = aboutPage?.missionBody  // richText | null
   const partnersTitle = aboutPage?.partnersTitle || (isZh ? '伙伴' : 'Partners')
-
   // Partners: use CMS entries if any, else defaults
   const cmsPartners: any[] = aboutPage?.partners || []
-  const partners = cmsPartners.length > 0 ? cmsPartners : DEFAULT_PARTNERS
+  const partners = cmsPartners.length > 0 ? cmsPartners : []
+  // const partners = DEFAULT_PARTNERS
 
   return (
     <div className="bg-white">

@@ -17,7 +17,6 @@ interface NavItem {
 interface Props {
   siteSettings: any
   navigation: any
-  contactInfo: any
   locale: string
 }
 

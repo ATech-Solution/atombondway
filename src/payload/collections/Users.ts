@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import type { User } from '@/payload-types'
-import { isAdmin, isAuthenticated } from '../access'
+import { isAdmin, isAuthenticated } from '../access/index.ts'
 
 const buildVerifyEmailHTML = (user: User, token: string): string => {
   const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/users/verify/${token}`

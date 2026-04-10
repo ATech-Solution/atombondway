@@ -13,10 +13,10 @@ export function AdminLogo() {
       {/* Icon badge */}
       <div
         style={{
-          width: 36,
-          height: 36,
+          width: 50,
+          height: 50,
           borderRadius: 8,
-          background: 'linear-gradient(135deg, #034F98 0%, #3c97eb 100%)',
+          // background: 'linear-gradient(135deg, #034F98 0%, #3c97eb 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -33,7 +33,7 @@ export function AdminLogo() {
             fontFamily: 'system-ui, sans-serif',
           }}
         >
-          AB
+          Home
         </span>
       </div>
 

@@ -138,82 +138,48 @@ async function seed() {
   })
   console.log('✓ Navigation')
 
-  // ─── Hero ─────────────────────────────────────────────────────────
+  // ─── Hero (via home-page global) ──────────────────────────────────
   await payload.updateGlobal({
-    slug: 'hero-content',
+    slug: 'home-page',
     locale: 'en',
     data: {
-      heading: 'WE SEAL THE SUCCESS OF HONG KONG',
-      subheading:
-        'Official distributor of high-performance building materials for curtain wall façade projects in Hong Kong.',
-      ctaPrimary:  { text: 'TELL ME MORE', href: '/about' },
-      ctaSecondary: { text: 'OUR PROJECTS', href: '/projects' },
-      overlayOpacity: 55,
-      meta: {
-        title: 'Atom Bondway — We Seal the Success of Hong Kong',
-        description:
-          "Official distributor of DOWSIL™ silicone sealants, Saint Gobain spacer tapes, and Wood's Powr-Grip suction grips for curtain wall projects in Hong Kong.",
-      },
+      heroSectionTitle: 'WE SEAL THE SUCCESS OF HONG KONG',
+      heroSectionCtaText: 'TELL ME MORE',
+      heroSectionCtaHref: '/about',
+      heroSectionoverlayOpacity: 55,
+      seoTitle: 'Atom Bondway — We Seal the Success of Hong Kong',
+      seoDescription:
+        "Official distributor of DOWSIL™ silicone sealants, Saint Gobain spacer tapes, and Wood's Powr-Grip suction grips for curtain wall projects in Hong Kong.",
     } as any,
   })
   await payload.updateGlobal({
-    slug: 'hero-content',
+    slug: 'home-page',
     locale: 'zh',
     data: {
-      heading: '鋪創香港成功之路',
-      subheading: '力新邦威有限公司是優質幕牆建築工程材料的官方香港經銷商，誠信服務業界超過二十年。',
-      ctaPrimary:  { text: '了解更多', href: '/about' },
-      ctaSecondary: { text: '我們的項目', href: '/projects' },
-      overlayOpacity: 55,
+      heroSectionTitle: '鋪創香港成功之路',
+      heroSectionCtaText: '了解更多',
+      heroSectionCtaHref: '/about',
+      heroSectionoverlayOpacity: 55,
     } as any,
   })
   console.log('✓ Hero Content')
 
-  // ─── About ────────────────────────────────────────────────────────
+  // ─── About Page ───────────────────────────────────────────────────
   await payload.updateGlobal({
-    slug: 'about-content',
+    slug: 'about-page',
     locale: 'en',
     data: {
-      sectionLabel: 'About Us',
-      heading: 'Your Trusted Building Materials Partner',
-      stats: [
-        { value: '2001', label: 'Founded' },
-        { value: '20+',  label: 'Years of Service' },
-        { value: '100+', label: 'Projects Completed' },
-        { value: '3',    label: 'Major Brand Partners' },
-      ],
-      highlights: [
-        { title: 'Safety',          description: 'All products meet international safety and quality standards.' },
-        { title: 'Trust',           description: 'Official distributor with direct brand partnerships since 2001.' },
-        { title: 'Professionalism', description: 'Expert project management and technical support on every job.' },
-      ],
-      meta: {
-        title: 'About Atom Bondway | Official Building Materials Distributor',
-        description:
-          'Founded in 2001, Atom Bondway is the official distributor of high-performance building materials for curtain wall façade projects in Hong Kong.',
-      },
+      pageTitle: 'Your Trusted Building Materials Partner',
     } as any,
   })
   await payload.updateGlobal({
-    slug: 'about-content',
+    slug: 'about-page',
     locale: 'zh',
     data: {
-      sectionLabel: '關於我們',
-      heading: '您值得信賴的建築材料夥伴',
-      stats: [
-        { value: '2001', label: '成立年份' },
-        { value: '20+',  label: '年服務經驗' },
-        { value: '100+', label: '完成項目' },
-        { value: '3',    label: '主要品牌夥伴' },
-      ],
-      highlights: [
-        { title: '安全', description: '所有產品符合國際安全及質量標準。' },
-        { title: '可靠', description: '自2001年起與主要品牌建立直接合作關係的官方經銷商。' },
-        { title: '專業', description: '每個項目均提供專業項目管理及技術支援。' },
-      ],
+      pageTitle: '您值得信賴的建築材料夥伴',
     } as any,
   })
-  console.log('✓ About Content')
+  console.log('✓ About Page')
 
   // ─── Services Page ────────────────────────────────────────────────
   await payload.updateGlobal({
@@ -302,9 +268,9 @@ async function seed() {
   })
   console.log('✓ Projects Page')
 
-  // ─── Contact Info ─────────────────────────────────────────────────
+  // ─── Contact Info (via footer-settings global) ────────────────────
   await payload.updateGlobal({
-    slug: 'contact-info',
+    slug: 'footer-settings',
     locale: 'en',
     data: {
       address:      'Room A, 21/F, Yam Tze Commercial Building,\n23 Thomson Road, Wan Chai, Hong Kong',
@@ -313,65 +279,23 @@ async function seed() {
       email:        'info@atombondway.com.hk',
       businessHours:'Mon – Fri: 9:00am – 6:00pm',
       contactFormEnabled: true,
-      meta: {
-        title: 'Contact Atom Bondway | Wan Chai, Hong Kong',
-        description:
-          'Get in touch with Atom Bondway. Visit us at Room A, 21/F, Yam Tze Commercial Building, 23 Thomson Road, Wan Chai, Hong Kong.',
-      },
+      showContactInfo: true,
+      copyrightText: `© ${new Date().getFullYear()} Atom Bondway Company Limited. All Rights Reserved.`,
+      showBackToTop: true,
     } as any,
   })
   await payload.updateGlobal({
-    slug: 'contact-info',
+    slug: 'footer-settings',
     locale: 'zh',
     data: {
       address:      '香港灣仔莊士敦道23號\n任資商業大廈21樓A室',
-      phone:        '+(852) 2563 9800',
-      fax:          '+(852) 2563 3298',
-      email:        'info@atombondway.com.hk',
       businessHours:'星期一至五：上午9時至下午6時',
-      contactFormEnabled: true,
+      copyrightText: `© ${new Date().getFullYear()} 力新邦威有限公司。版權所有。`,
     } as any,
   })
   console.log('✓ Contact Info')
 
-  // ─── Services ─────────────────────────────────────────────────────
-  const servicesData = [
-    {
-      en: { title: 'Drawing Review',        short: 'Our team reviews architectural and engineering drawings to verify correct product specifications before installation begins.' },
-      zh: { title: '審圖',                   short: '我們的團隊審查建築及工程圖紙，在施工前核實正確的產品規格。' },
-      icon: 'file-text', order: 1,
-    },
-    {
-      en: { title: 'Sample Testing',        short: 'We conduct rigorous sample testing to ensure all materials meet project requirements and international quality standards.' },
-      zh: { title: '樣本測試',                short: '我們進行嚴格的樣本測試，確保所有材料符合項目要求及國際質量標準。' },
-      icon: 'flask-conical', order: 2,
-    },
-    {
-      en: { title: 'Gasket Cutting Service', short: 'Precision gasket and rubber cutting services tailored to the exact dimensions required for your curtain wall project.' },
-      zh: { title: '割膠服務',                short: '提供精準的橡膠墊切割服務，按幕牆項目的確切尺寸訂製。' },
-      icon: 'scissors', order: 3,
-    },
-    {
-      en: { title: 'Quality Certification', short: 'We provide comprehensive quality certification documentation for all products, ensuring compliance with industry and safety standards.' },
-      zh: { title: '質素認證證書',             short: '為所有產品提供全面的質量認證文件，確保符合行業及安全標準。' },
-      icon: 'award', order: 4,
-    },
-  ]
-
-  for (const svc of servicesData) {
-    const slug = svc.en.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-    const existingSvc = await payload.find({ collection: 'services', where: { slug: { equals: slug } }, limit: 1 })
-    let id: string | number
-    if (existingSvc.docs.length) {
-      id = existingSvc.docs[0].id
-      await payload.update({ collection: 'services', id, locale: 'en', data: { title: svc.en.title, shortDescription: svc.en.short, icon: svc.icon, order: svc.order, slug } as any })
-    } else {
-      const doc = await payload.create({ collection: 'services', locale: 'en', data: { title: svc.en.title, shortDescription: svc.en.short, icon: svc.icon, order: svc.order, slug } as any })
-      id = doc.id
-    }
-    await payload.update({ collection: 'services', id, locale: 'zh', data: { title: svc.zh.title, shortDescription: svc.zh.short } as any })
-  }
-  console.log('✓ Services (4)')
+  // ─── Services collection removed — services are now managed via the ServicesPage global ───
 
   // ─── Products ─────────────────────────────────────────────────────
   const productsData = [

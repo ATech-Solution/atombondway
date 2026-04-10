@@ -1,5 +1,5 @@
 import type { GlobalConfig } from 'payload'
-import { isAuthenticated, isPublic } from '../access'
+import { isAuthenticated, isPublic } from '../access/index.ts'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',

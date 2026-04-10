@@ -12,15 +12,27 @@ type Props = { params: Promise<{ locale: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
+  const payload = await getPayloadClient()
   const loc = locale as 'en' | 'zh'
+  const [servicesPage] = await Promise.all([
+    payload.findGlobal({ slug: 'services-page', locale: loc }).catch(() => null),
+  ])
+  const meta = (servicesPage as any)?.meta || []
   return {
     title: loc === 'zh' ? '服務 | 力新邦威' : 'Services | Atom Bondway',
-
+    description: meta?.description || (loc === 'zh'
+      ? '力新邦威有限公司是優質幕牆建築工程材料的官方香港經銷商。於2001年成立，多年來一直致力與主要伙伴緊密合作，以安全、可靠及專業為宗旨，為客戶提供頂級的幕牆系統及結構密封服務。'
+      : 'Atom Bondway Co. Ltd. is the official distributor of high-performance building materials for curtain wall façade projects in Hong Kong. Founded in 2001, we work closely with our major brand partners to provide top quality curtain wall systems and structural sealant services to our valued customers. With over decades of service, Atom Bondway strives to always deliver Safety, Trust, and Professionalism.'),
     alternates: {
       canonical: absoluteUrl(locale === 'en' ? '/services' : `/${locale}/services`),
       languages: { en: absoluteUrl('/services'), zh: absoluteUrl('/zh/services') },
     },
   }
+}
+
+/// Helper: check if a richText field has actual content
+function hasRichText(data: any): boolean {
+  return !!data?.root?.children?.length
 }
 
 // Static fallback — used only when Collections > Services is empty
@@ -99,49 +111,65 @@ export default async function ServicesPage({ params }: Props) {
   const { locale } = await params
   setRequestLocale(locale)
   const loc = locale as 'en' | 'zh'
+  const isZh = loc === 'zh'
 
   const payload = await getPayloadClient()
-  const cmsServicesResult = await payload
-    .find({ collection: 'services', locale: loc, sort: 'order', limit: 20, depth: 1 })
-    .catch(() => ({ docs: [] }))
+  // const cmsServicesResult = await payload
+  //   .find({ collection: 'services', locale: loc, sort: 'order', limit: 20, depth: 1 })
+  //   .catch(() => ({ docs: [] }))
 
-  const pageTitle = loc === 'zh' ? '我們的服務' : 'Our Services'
-  const cmsServices: any[] = cmsServicesResult.docs || []
-  const useStatic = cmsServices.length === 0
+  // const pageTitle = loc === 'zh' ? '我們的服務' : 'Our Services'
+  // const cmsServices: any[] = cmsServicesResult.docs || []
+  // const useStatic = cmsServices.length === 0
+  // const useStatic = 1
+  
+  const servicesPage = await payload.findGlobal({ slug: 'services-page', locale: loc, depth: 1 }).catch(() => null) as any
 
+  const pageTitle     = servicesPage?.pageTitle    || (isZh ? '關於力新邦威' : 'Who We Are')
+  const pageBody      = servicesPage?.pageSubtitle || [isZh ? '力新邦威有限公司為客戶提供項目管理服務，請與我們了解更多關於我們的服務範疇。' : 'Atom Bondway provides Project Management Services for our customers. Please contact us to learn more about our service offerings.']
+  const cmsValues: any[] = servicesPage?.values || []
+  const values = cmsValues.length > 0 ? cmsValues : []
+  
   return (
     <div className="bg-white">
       <PageBanner />
 
       <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-12 md:py-16">
-        <h1 className="page-title font-bold text-[#10242b] mb-4">{pageTitle}</h1>
+        <h1 className="page-title font-bold text-[#10242b] mb-4">
+          {pageTitle}
+        </h1>
 
         <p className="text-gray-600 text-xl leading-relaxed mb-12 max-w-3xl">
-          {loc === 'zh'
-            ? '力新邦威有限公司為客戶提供項目管理服務，請與我們了解更多關於我們的服務範疇。'
-            : 'Atom Bondway provides Project Management Services for our customers. Please contact us to learn more about our service offerings.'}
+          {pageBody ? (
+            <RichText data={pageBody} />
+          ) : (
+            <>
+              {loc === 'zh'
+                ? '力新邦威有限公司為客戶提供項目管理服務，請與我們了解更多關於我們的服務範疇。'
+                : 'Atom Bondway provides Project Management Services for our customers. Please contact us to learn more about our service offerings.'}
+            </>
+          )}
         </p>
 
         {/* CMS services from Collections > Services */}
-        {!useStatic && (
+        {/* {!useStatic && ( */}
           <div className="space-y-12">
-            {cmsServices.map((svc: any) => (
+            {values.map((svc: any) => (
               <div key={svc.id} className="grid grid-cols-12 gap-6 items-start">
-                {svc.image?.url && (
+                {svc.logo?.url && (
                   <div className="col-span-4 sm:col-span-2 flex justify-center vertical-center h-full">
                     <Image
-                      src={svc.image.url}
-                      alt={svc.image.alt || svc.title}
+                      src={svc.logo.url}
+                      alt={svc.logo.alt || svc.name}
                       width={100}
                       height={140}
                       className="object-contain"
                     />
                   </div>
                 )}
-                <div className={svc.image?.url ? 'col-span-8 sm:col-span-10 max-w-3xl' : 'col-span-12 max-w-3xl'}>
-                  <h2 className="page-sub-title text-2xl font-bold text-[#10242b] mb-3">{svc.title}</h2>
-                  {svc.shortDescription && (
-                    <p className="text-gray-500 mb-3 leading-relaxed">{svc.shortDescription}</p>
+                <div className={svc.logo?.url ? 'col-span-8 sm:col-span-10 max-w-3xl' : 'col-span-12 max-w-3xl'}>
+                  {svc.name && (
+                    <h2 className="page-sub-title text-2xl font-bold text-[#10242b] mb-3">{svc.name}</h2>
                   )}
                   {svc.description?.root?.children?.length > 0 && (
                     <div className="mb-8">
@@ -152,10 +180,10 @@ export default async function ServicesPage({ params }: Props) {
               </div>
             ))}
           </div>
-        )}
+        {/* )} */}
 
         {/* Static fallback */}
-        {useStatic && (
+        {/* {useStatic && (
           <div className="space-y-12">
             {(SERVICES_STATIC[loc] ?? []).map((svc) => (
               <div key={svc.title} className="grid grid-cols-12 gap-6 items-start">
@@ -171,7 +199,7 @@ export default async function ServicesPage({ params }: Props) {
               </div>
             ))}
           </div>
-        )}
+        )} */}
       </div>
     </div>
   )

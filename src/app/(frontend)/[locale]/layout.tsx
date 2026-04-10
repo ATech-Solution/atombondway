@@ -64,14 +64,13 @@ const getGlobals = unstable_cache(
   async (locale: string) => {
     const payload = await getPayloadClient()
     const loc = locale as 'en' | 'zh'
-    const [siteSettings, navigation, contactInfo, footerSettings, customCss] = await Promise.all([      
+    const [siteSettings, navigation, footerSettings, customCss] = await Promise.all([      
       payload.findGlobal({ slug: 'site-settings', locale: loc }).catch(() => null),
       payload.findGlobal({ slug: 'navigation', locale: loc }).catch(() => null),
-      payload.findGlobal({ slug: 'contact-info', locale: loc }).catch(() => null),
       payload.findGlobal({ slug: 'footer-settings', locale: loc }).catch(() => null),
       payload.findGlobal({ slug: 'custom-css' }).catch(() => null),
     ])
-    return { siteSettings, navigation, contactInfo, footerSettings, customCss }
+    return { siteSettings, navigation, footerSettings, customCss }
   },
   ['layout-globals'],
   { revalidate: 3600 },
@@ -88,10 +87,8 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale)
   const messages = await getMessages()
 
-  const { siteSettings, navigation, contactInfo, footerSettings, customCss } = await getGlobals(locale)
+  const { siteSettings, navigation, footerSettings, customCss } = await getGlobals(locale)
   const customCssString = (customCss as any)?.css ?? ''
-
-// console.log('contactInfo', JSON.stringify(contactInfo, null, 2))
 
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
@@ -102,16 +99,14 @@ export default async function LocaleLayout({ children, params }: Props) {
       <Header
         siteSettings={siteSettings}
         navigation={navigation}
-        contactInfo={contactInfo}
         locale={locale}
       />
       {/* pt-[80px] = mobile fixed header height; pt-[109px] = desktop — only when stickyHeader is on  pt-[80px] lg:pt-[109px]*/}
       <main className={(siteSettings as any)?.stickyHeader ? '' : ''}>{children}</main>
       <Footer
         siteSettings={siteSettings}
-        navigation={navigation}
-        contactInfo={contactInfo}
         footerSettings={footerSettings}
+        locale={locale}
       />
     </NextIntlClientProvider>
   )

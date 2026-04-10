@@ -1,6 +1,6 @@
 import type { GlobalConfig } from 'payload'
-import { isAuthenticated, isPublic } from '../access'
-import { seoFields } from '../fields/seoFields'
+import { isAuthenticated, isPublic } from '../access/index.ts'
+import { seoFields } from '../fields/seoFields.ts'
 
 export const AboutPage: GlobalConfig = {
   slug: 'about-page',
