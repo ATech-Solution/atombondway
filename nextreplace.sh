@@ -22,21 +22,36 @@ sudo mv next .next
 # sudo chmod -R 755 .next
 sudo rm -rf __MACOSX
 
+# set the permisson for site
+# Project root — deploy owns everything
+chown -R deploy:deploy /home/deploy/atombondway
+# .next/standalone — needs read + execute to run Node
+chmod -R 755 /home/deploy/atombondway/.next
+# data/ — needs write for SQLite (read/write/lock the .db file)
+chmod 750 /home/deploy/atombondway/data
+chmod 640 /home/deploy/atombondway/data/payload.db
+# public/media — needs write for file uploads
+chmod 755 /home/deploy/atombondway/public/media
+
 echo "📦 Pulling latest code..."
 #cd ~/atombondway
+git stash
+git stash drop
 git pull origin main
+#overwrite completely
+#git checkout origin/main -- package.json
 
-#echo "📥 Installing dependencies..."
-#npm install
+echo "📥 Installing dependencies..."
+npm install
 
-#echo "skip 🏗️ Building app..."
+echo "skip 🏗️ Building app... make sure already on local and pass .nextjs"
 #npm run build
 
-#echo "🔄 Restarting app..."
-#pm2 restart company-profile
+echo "🔄 Restarting app..."
 pm2 stop company-profile
 pm2 delete company-profile
 pm2 start npm --name "company-profile" -- start
+pm2 restart company-profile --update-env
 
 echo "✅ Deployed successfully!"
 pm2 status
