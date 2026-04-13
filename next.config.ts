@@ -64,9 +64,16 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      // Route all /media/* requests through Payload's file API so uploaded files
+      // are served correctly in standalone deployments where public/ isn't auto-served.
+      {
+        source: '/media/:path*',
+        destination: '/api/media/file/:path*',
+      },
+      // Favicon is stored as a media upload; proxy it through the same API.
       {
         source: '/favicon.ico',
-        destination: '/media/favicon.ico',
+        destination: '/api/media/file/favicon.ico',
       },
     ]
   },

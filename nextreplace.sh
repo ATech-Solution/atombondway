@@ -30,8 +30,10 @@ sudo chmod -R 755 /home/deploy/atombondway/.next
 # data/ — needs write for SQLite (read/write/lock the .db file)
 #sudo chmod 750 /home/deploy/atombondway/data
 #sudo chmod 640 /home/deploy/atombondway/data/payload.db
-# public/media — needs write for file uploads
-#sudo chmod 755 /home/deploy/atombondway/public/media
+# public/media — must exist and be writable for Payload file uploads
+mkdir -p /home/deploy/atombondway/public/media
+sudo chown -R deploy:deploy /home/deploy/atombondway/public/media
+sudo chmod 755 /home/deploy/atombondway/public/media
 
 echo "📦 Pulling latest code..."
 #cd ~/atombondway
