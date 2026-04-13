@@ -744,17 +744,6 @@ export interface SiteSetting {
    * When enabled, adds a noindex meta tag to all pages, preventing search engines from indexing the site.
    */
   noindex?: boolean | null;
-  /**
-   * Enter full URLs including https:// for each platform.
-   */
-  socialLinks?: {
-    facebook?: string | null;
-    linkedin?: string | null;
-    twitter?: string | null;
-    instagram?: string | null;
-    youtube?: string | null;
-    whatsapp?: string | null;
-  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -834,7 +823,7 @@ export interface HomePage {
   featuredProductsTitle?: string | null;
   featuredProductsMode?: ('featured_products' | 'category_links') | null;
   /**
-   * Configure up to 4 product category cards to display. Only used when Option 2 is selected.
+   * By Default already set to 3 main category (SILICONE SEALANTS,SPACER TAPES and SUCTION GRIPS). Configure up to 4 product category cards to display. Only used when Option 2 is selected.
    */
   featuredCategoryLinks?:
     | {
@@ -1180,13 +1169,9 @@ export interface FooterSetting {
    */
   businessHours?: string | null;
   /**
-   * Go to Google Maps → Share → Embed a map → Copy only the src="..." URL from the iframe code.
+   * Give link to icon contact section Footer Top. Go to Google Maps → Share → Embed a map → Copy only the src="..." URL from the iframe code.
    */
   mapEmbedUrl?: string | null;
-  /**
-   * Display the contact form on the Contact page.
-   */
-  contactFormEnabled?: boolean | null;
   /**
    * Display address, phone, email and fax from Layout > Contact Information in the footer top section.
    */
@@ -1237,16 +1222,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
       };
   stickyHeader?: T;
   noindex?: T;
-  socialLinks?:
-    | T
-    | {
-        facebook?: T;
-        linkedin?: T;
-        twitter?: T;
-        instagram?: T;
-        youtube?: T;
-        whatsapp?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1436,7 +1411,6 @@ export interface FooterSettingsSelect<T extends boolean = true> {
   fax?: T;
   businessHours?: T;
   mapEmbedUrl?: T;
-  contactFormEnabled?: T;
   showContactInfo?: T;
   copyrightText?: T;
   showBackToTop?: T;

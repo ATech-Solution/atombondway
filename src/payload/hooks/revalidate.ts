@@ -1,14 +1,17 @@
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook } from 'payload'
 
 const locales = ['en', 'zh']
 
-/** Revalidate every locale route so stale ISR pages are flushed immediately. */
+/** Revalidate every locale route so stale ISR pages are flushed immediately.
+ *  Also busts the layout unstable_cache so header/footer/nav update instantly. */
 function purgeAll(): void {
+  // Bust the layout globals cache (navigation, footer, custom CSS, site settings)
+  revalidateTag('layout-globals')
+
   for (const locale of locales) {
     revalidatePath(`/${locale}`, 'layout')
   }
-  // Also revalidate the root in case there's a redirect/root layout
   revalidatePath('/', 'layout')
 }
 

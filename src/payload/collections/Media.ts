@@ -1,12 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import { isAuthenticated, isPublic } from '../access/index.ts'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate.ts'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
 
 const mediaUploadDir = process.env.PAYLOAD_MEDIA_DIR
   ? path.resolve(process.cwd(), process.env.PAYLOAD_MEDIA_DIR)
@@ -85,7 +81,9 @@ export const Media: CollectionConfig = {
   },
   upload: {
     // Store files in public/media — served as static files by Next.js
-    staticDir: path.resolve(dirname, '../../../public/media'),
+    // Use mediaUploadDir (process.cwd()-based) so the path is always relative
+    // to the running process — never the dev machine's absolute path baked in at build time.
+    staticDir: mediaUploadDir,
     // Disable local storage to ensure files are always written to disk
     disableLocalStorage: false,
     imageSizes: [

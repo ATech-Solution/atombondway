@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { unstable_cache } from 'next/cache'
 import { routing } from '@/i18n/routing'
 import { getPayloadClient } from '@/lib/payload'
+import { getSiteUrl } from '@/lib/utils'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { json } from 'stream/consumers'
@@ -51,7 +52,7 @@ export async function generateMetadata({
     const noindex = (settings as any)?.noindex === true
     const faviconUrl = (settings as any)?.favicon?.url
     return {
-      metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'https://atombondway.com'),
+      metadataBase: new URL(getSiteUrl()),
       title: { default: companyName, template: `%s | ${companyName}` },
       robots: noindex ? { index: false, follow: false } : undefined,
       icons: faviconUrl ? { icon: faviconUrl, shortcut: faviconUrl } : undefined,
@@ -65,7 +66,7 @@ const getGlobals = unstable_cache(
   async (locale: string) => {
     const payload = await getPayloadClient()
     const loc = locale as 'en' | 'zh'
-    const [siteSettings, navigation, footerSettings, customCss] = await Promise.all([      
+    const [siteSettings, navigation, footerSettings, customCss] = await Promise.all([
       payload.findGlobal({ slug: 'site-settings', locale: loc }).catch(() => null),
       payload.findGlobal({ slug: 'navigation', locale: loc }).catch(() => null),
       payload.findGlobal({ slug: 'footer-settings', locale: loc }).catch(() => null),
@@ -74,7 +75,10 @@ const getGlobals = unstable_cache(
     return { siteSettings, navigation, footerSettings, customCss }
   },
   ['layout-globals'],
-  { revalidate: 3600 },
+  // tags lets revalidateTag('layout-globals') bust this cache immediately
+  // when any global is updated in the admin — revalidatePath alone does not
+  // reach unstable_cache entries.
+  { revalidate: 3600, tags: ['layout-globals'] },
 )
 
 export default async function LocaleLayout({ children, params }: Props) {
