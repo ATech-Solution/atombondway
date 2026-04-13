@@ -112,7 +112,8 @@ export default function Header({ siteSettings, navigation, locale }: Props) {
               alt={companyName}
               width={323}
               height={50}
-              className="h-[48px] w-auto object-contain"
+              style={{ width: 'auto', height: '48px'}}
+              className="object-contain"
               priority
             />
           </Link>

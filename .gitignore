@@ -146,3 +146,6 @@ src/payload/.DS_Store
 /src/migrations
 /next
 next.zip
+src/.DS_Store
+next.zip
+.DS_Store

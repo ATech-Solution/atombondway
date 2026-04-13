@@ -24,8 +24,11 @@ const VISIBLE = { desktop: 4, tablet: 2, mobile: 1 }
 export default function ProjectsCarousel({ projects, locale }: Props) {
   const [index, setIndex] = useState(0)
   const [dragging, setDragging] = useState(false)
-  const [dragStart, setDragStart] = useState(0)
   const [dragDelta, setDragDelta] = useState(0)
+  const draggingRef = useRef(false)
+  const dragStartRef = useRef(0)
+  const dragDeltaRef = useRef(0)
+  const didDragRef = useRef(false)
   const [perView, setPerView] = useState(VISIBLE.desktop)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -71,23 +74,31 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
 
   // Pointer drag (mouse + touch)
   const onPointerDown = (e: React.PointerEvent) => {
+    draggingRef.current = true
+    didDragRef.current = false
+    dragStartRef.current = e.clientX
+    dragDeltaRef.current = 0
     setDragging(true)
-    setDragStart(e.clientX)
     setDragDelta(0)
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
   }
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragging) return
-    setDragDelta(e.clientX - dragStart)
+    if (!draggingRef.current) return
+    const delta = e.clientX - dragStartRef.current
+    dragDeltaRef.current = delta
+    if (Math.abs(delta) > 5) didDragRef.current = true
+    setDragDelta(delta)
   }
 
   const onPointerUp = () => {
-    if (!dragging) return
+    if (!draggingRef.current) return
+    draggingRef.current = false
     setDragging(false)
-    if (dragDelta < -60) { advance(1); resetTimer() }
-    else if (dragDelta > 60) { advance(-1); resetTimer() }
     setDragDelta(0)
+    const delta = dragDeltaRef.current
+    dragDeltaRef.current = 0
+    if (delta < -60) { advance(1); resetTimer() }
+    else if (delta > 60) { advance(-1); resetTimer() }
   }
 
   const handleArrow = (dir: 1 | -1) => {
@@ -128,7 +139,7 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
                 className="group block bg-white overflow-hidden shadow-sm  transition-shadow"
                 // hover:shadow-md
                 draggable={false}
-                onClick={(e) => { if (Math.abs(dragDelta) > 5) e.preventDefault() }}
+                onClick={(e) => { if (didDragRef.current) { didDragRef.current = false; e.preventDefault() } }}
               >
                 <div className="relative overflow-hidden" style={{ height: 180 }}>
                   <Image

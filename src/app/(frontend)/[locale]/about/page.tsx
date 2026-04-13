@@ -119,13 +119,13 @@ export default async function AboutPage({ params }: Props) {
             const src = p.logo?.url || p.logoUrl || ''
             if (!src) return null
             return (
-              <div key={p.name} className="flex items-center justify-center">
+              <div key={p.name} className="relative" style={{ width: 220, height: 90 }}>
                 <Image
                   src={src}
                   alt={p.name}
-                  width={220}
-                  height={90}
+                  fill
                   className="object-contain"
+                  sizes="220px"
                 />
               </div>
             )

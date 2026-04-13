@@ -126,7 +126,8 @@ export default async function ProductDetailPage({ params }: Props) {
                   alt={product.image.alt || product.name}
                   width={product.image.width || 800}
                   height={product.image.height || 800}
-                  className="object-contain w-full h-auto p-8"
+                  className="object-contain p-8"
+                  style={{ width: '100%', height: 'auto' }}
                   priority
                   sizes="(max-width:768px)100vw,42vw"
                 />

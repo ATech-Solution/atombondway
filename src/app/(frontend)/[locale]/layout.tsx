@@ -51,6 +51,7 @@ export async function generateMetadata({
     const noindex = (settings as any)?.noindex === true
     const faviconUrl = (settings as any)?.favicon?.url
     return {
+      metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'https://atombondway.com'),
       title: { default: companyName, template: `%s | ${companyName}` },
       robots: noindex ? { index: false, follow: false } : undefined,
       icons: faviconUrl ? { icon: faviconUrl, shortcut: faviconUrl } : undefined,

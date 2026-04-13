@@ -71,6 +71,7 @@ export default function Footer({ siteSettings, footerSettings, locale }: Props) 
                       width={35}
                       height={53}
                       className="object-contain"
+                      style={{ height: 'auto' }}
                     />
                   </a>
 

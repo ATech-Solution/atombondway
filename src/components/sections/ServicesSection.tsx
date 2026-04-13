@@ -76,12 +76,15 @@ export default async function ServicesSection({ locale, homePageData }: Props) {
                          transition-colors duration-300 bg-white"
             >
               <div className="mb-4 flex items-center justify-center" style={{ height: 146 }}>
-                <Image
-                  src={svc.servicesSectionHighlightsImage.url || '/images/placeholder.jpg'}
-                  alt={svc.servicesSectionHighlightsTitle}
-                  width={146}
-                  height={146}
-                />
+                <div className="relative" style={{ width: 146, height: 146 }}>
+                  <Image
+                    src={svc.servicesSectionHighlightsImage.url || '/images/placeholder.jpg'}
+                    alt={svc.servicesSectionHighlightsTitle}
+                    fill
+                    className="object-contain"
+                    sizes="146px"
+                  />
+                </div>
               </div>
               <h3 className="section-sub-title text-[#10242b] text-sm font-normal py-3">{svc.servicesSectionHighlightsTitle}</h3>
               {svc.servicesSectionHighlightsDescription && (

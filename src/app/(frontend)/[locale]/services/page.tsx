@@ -139,7 +139,7 @@ export default async function ServicesPage({ params }: Props) {
           {pageTitle}
         </h1>
 
-        <p className="text-gray-600 text-xl leading-relaxed mb-12 max-w-3xl">
+        <div className="text-gray-600 text-xl leading-relaxed mb-12 max-w-3xl">
           {pageBody ? (
             <RichText data={pageBody} />
           ) : (
@@ -149,7 +149,7 @@ export default async function ServicesPage({ params }: Props) {
                 : 'Atom Bondway provides Project Management Services for our customers. Please contact us to learn more about our service offerings.'}
             </>
           )}
-        </p>
+        </div>
 
         {/* CMS services from Collections > Services */}
         {/* {!useStatic && ( */}
@@ -157,14 +157,16 @@ export default async function ServicesPage({ params }: Props) {
             {values.map((svc: any) => (
               <div key={svc.id} className="grid grid-cols-12 gap-6 items-start">
                 {svc.logo?.url && (
-                  <div className="col-span-4 sm:col-span-2 flex justify-center vertical-center h-full">
-                    <Image
-                      src={svc.logo.url}
-                      alt={svc.logo.alt || svc.name}
-                      width={100}
-                      height={140}
-                      className="object-contain"
-                    />
+                  <div className="col-span-4 sm:col-span-2 flex justify-center items-start pt-1">
+                    <div className="relative" style={{ width: 100, height: 140 }}>
+                      <Image
+                        src={svc.logo.url}
+                        alt={svc.logo.alt || svc.name}
+                        fill
+                        className="object-contain"
+                        sizes="100px"
+                      />
+                    </div>
                   </div>
                 )}
                 <div className={svc.logo?.url ? 'col-span-8 sm:col-span-10 max-w-3xl' : 'col-span-12 max-w-3xl'}>
