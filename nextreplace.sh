@@ -28,10 +28,10 @@ sudo chown -R deploy:deploy /home/deploy/atombondway
 # .next/standalone — needs read + execute to run Node
 sudo chmod -R 755 /home/deploy/atombondway/.next
 # data/ — needs write for SQLite (read/write/lock the .db file)
-sudo chmod 750 /home/deploy/atombondway/data
-sudo chmod 640 /home/deploy/atombondway/data/payload.db
+#sudo chmod 750 /home/deploy/atombondway/data
+#sudo chmod 640 /home/deploy/atombondway/data/payload.db
 # public/media — needs write for file uploads
-sudo chmod 755 /home/deploy/atombondway/public/media
+#sudo chmod 755 /home/deploy/atombondway/public/media
 
 echo "📦 Pulling latest code..."
 #cd ~/atombondway
