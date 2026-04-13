@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { isAuthenticated, isPublic } from '../access/index.ts'
+import { revalidateGlobalOnChange } from '../hooks/revalidate.ts'
 
 export const HomePage: GlobalConfig = {
   slug: 'home-page',
@@ -11,6 +12,9 @@ export const HomePage: GlobalConfig = {
   access: {
     read: isPublic,
     update: isAuthenticated,
+  },
+  hooks: {
+    afterChange: [revalidateGlobalOnChange],
   },
   fields: [
     {
@@ -143,7 +147,7 @@ export const HomePage: GlobalConfig = {
               label: 'Category Links (Option 2 only)',
               maxRows: 4,
               admin: {
-                description: 'Configure up to 4 product category cards to display. Only used when Option 2 is selected.',
+                description: 'By Default already set to 3 main category (SILICONE SEALANTS,SPACER TAPES and SUCTION GRIPS). Configure up to 4 product category cards to display. Only used when Option 2 is selected.',
                 condition: (data: any) => data?.featuredProductsMode === 'category_links',
               },
               fields: [

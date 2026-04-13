@@ -44,21 +44,25 @@ export function absoluteUrl(path: string): string {
   return `${base}/${path.replace(/^\//, '')}`
 }
 
+/**
+ * Returns the URL for a Payload media object.
+ *
+ * Relative paths (/media/...) are returned as-is so next/image resolves
+ * them as local files via localPatterns — no host needed, no config risk.
+ * Only truly external URLs (CDN, etc.) are returned unchanged as absolute.
+ */
 export function getMediaUrl(media: { url?: string | null } | null | undefined): string | null {
   if (!media?.url) return null
-  const url = media.url
+  return media.url
+}
 
-  // If it's already an absolute URL, return as is
-  if (url.startsWith('http')) {
-    return url
-  }
-
-  // If it's a relative path starting with /, make it absolute
-  if (url.startsWith('/')) {
-    const base = getSiteUrl()
-    return `${base}${url}`
-  }
-
-  // For any other case, return as is
-  return url
+/**
+ * Like getMediaUrl but always returns an absolute URL.
+ * Use this only where absolute URLs are required (e.g. OG image meta tags).
+ */
+export function getAbsoluteMediaUrl(media: { url?: string | null } | null | undefined): string | null {
+  const url = getMediaUrl(media)
+  if (!url) return null
+  if (url.startsWith('http')) return url
+  return `${getSiteUrl()}${url.startsWith('/') ? url : `/${url}`}`
 }

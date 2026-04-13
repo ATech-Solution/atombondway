@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
 import { getPayloadClient } from '@/lib/payload'
-import { absoluteUrl } from '@/lib/utils'
+import { buildSeoMetadata } from '@/lib/seo'
 import PageBanner from '@/components/ui/PageBanner'
 import RichText from '@/components/ui/RichText'
 
@@ -14,20 +14,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
   const payload = await getPayloadClient()
   const loc = locale as 'en' | 'zh'
-  const [servicesPage] = await Promise.all([
+
+  const [servicesPage, siteSettings] = await Promise.all([
     payload.findGlobal({ slug: 'services-page', locale: loc }).catch(() => null),
+    payload.findGlobal({ slug: 'site-settings', locale: loc }).catch(() => null),
   ])
-  const meta = (servicesPage as any)?.meta || []
-  return {
-    title: loc === 'zh' ? '服務 | 力新邦威' : 'Services | Atom Bondway',
-    description: meta?.description || (loc === 'zh'
-      ? '力新邦威有限公司是優質幕牆建築工程材料的官方香港經銷商。於2001年成立，多年來一直致力與主要伙伴緊密合作，以安全、可靠及專業為宗旨，為客戶提供頂級的幕牆系統及結構密封服務。'
-      : 'Atom Bondway Co. Ltd. is the official distributor of high-performance building materials for curtain wall façade projects in Hong Kong. Founded in 2001, we work closely with our major brand partners to provide top quality curtain wall systems and structural sealant services to our valued customers. With over decades of service, Atom Bondway strives to always deliver Safety, Trust, and Professionalism.'),
-    alternates: {
-      canonical: absoluteUrl(locale === 'en' ? '/services' : `/${locale}/services`),
-      languages: { en: absoluteUrl('/services'), zh: absoluteUrl('/zh/services') },
-    },
-  }
+
+  const ss = siteSettings as any
+  const fallbackDesc = loc === 'zh'
+    ? '力新邦威有限公司是優質幕牆建築工程材料的官方香港經銷商。於2001年成立，多年來一直致力與主要伙伴緊密合作，以安全、可靠及專業為宗旨，為客戶提供頂級的幕牆系統及結構密封服務。'
+    : 'Atom Bondway Co. Ltd. is the official distributor of high-performance building materials for curtain wall façade projects in Hong Kong.'
+
+  return buildSeoMetadata({
+    locale,
+    path: '/services',
+    meta: (servicesPage as any)?.meta,
+    defaults: { ...ss?.defaultMeta, noindex: ss?.noindex, companyName: ss?.companyName },
+    fallbackTitle: loc === 'zh' ? '服務' : 'Services',
+    fallbackDescription: fallbackDesc,
+  })
 }
 
 /// Helper: check if a richText field has actual content

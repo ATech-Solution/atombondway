@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation'
 import { getPayloadClient } from '@/lib/payload'
 
 export const revalidate = 3600
-import { absoluteUrl } from '@/lib/utils'
+import { buildSeoMetadata } from '@/lib/seo'
 import SectionHeading from '@/components/ui/SectionHeading'
 import PageBanner from '@/components/ui/PageBanner'
 
@@ -21,25 +21,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     payload.findGlobal({ slug: 'site-settings', locale: loc }).catch(() => null),
   ])
 
-  const meta = (page as any)?.meta
-  const defaultMeta = (siteSettings as any)?.defaultMeta
-  const pageTitle = (page as any)?.pageTitle || (loc === 'zh' ? '我們的項目' : 'Our Projects')
-  const pageSubtitle = (page as any)?.pageSubtitle || ''
+  const p = page as any
+  const ss = siteSettings as any
 
-  return {
-    title: meta?.title || pageTitle,
-    description: meta?.description || pageSubtitle || defaultMeta?.description,
-    keywords: meta?.keywords || defaultMeta?.keywords,
-    alternates: {
-      canonical: absoluteUrl(locale === 'en' ? '/projects' : `/${locale}/projects`),
-      languages: { en: absoluteUrl('/projects'), zh: absoluteUrl('/zh/projects') },
-    },
-    openGraph: {
-      title: meta?.title || pageTitle,
-      description: meta?.description || pageSubtitle || '',
-      images: meta?.ogImage?.url ? [meta.ogImage.url] : [],
-    },
-  }
+  return buildSeoMetadata({
+    locale,
+    path: '/projects',
+    meta: p?.meta,
+    defaults: { ...ss?.defaultMeta, noindex: ss?.noindex, companyName: ss?.companyName },
+    fallbackTitle: p?.pageTitle || (loc === 'zh' ? '我們的項目' : 'Our Projects'),
+    fallbackDescription: p?.pageSubtitle,
+  })
 }
 
 export default async function ProjectsPage({ params }: Props) {
@@ -66,8 +58,10 @@ export default async function ProjectsPage({ params }: Props) {
       <PageBanner />
       <section className="section-pys bg-white">
       <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-12 md:py-16">
-        <h1 className="page-title font-bold text-[#10242b] text-center mb-4">{pageTitle}</h1>
-        {/* {pageSubtitle && <p className="text-[#000] text-center py-3">{pageSubtitle}</p>} */}
+        <div className="mb-12">
+          <h1 className="page-title-have-into font-bold text-[#10242b] text-center">{pageTitle}</h1>
+          {pageSubtitle && <p className="text-[#000] text-center py-3">{pageSubtitle}</p>}
+        </div>
 
         {projects.length === 0 ? (
           <p className="text-center text-gray-500 py-16">{noProjects}</p>

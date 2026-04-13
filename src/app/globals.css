@@ -130,6 +130,16 @@ body.frontend {
   font-weight: 700;  
   text-transform: uppercase;
 }
+
+.frontend .page-title-have-into {
+  font-size:clamp(28px, 3.5vw, 43px);
+  color: var(--heading);
+  line-height:1.2;
+  margin-bottom:20px;
+  font-weight: 700;  
+  text-transform: uppercase;
+}
+
 .frontend .page-sub-title {
   color: var(--heading);
   line-height:1.2;

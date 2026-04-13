@@ -76,7 +76,7 @@ export default buildConfig({
     user: Users.slug,
     suppressHydrationWarning: true,
     // autoLogin: process.env.NODE_ENV !== 'production'
-    //   ? { email: 'tan@atech.software', prefillOnly: false }
+    //   ? { email: 'dev@atech.software', prefillOnly: false }
     //   : false,
     meta: {
       titleSuffix: ' — Admin',

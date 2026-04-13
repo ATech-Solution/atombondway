@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { isAdmin, isPublic } from '../access/index.ts'
+import { revalidateGlobalOnChange } from '../hooks/revalidate.ts'
 
 export const CustomCSS: GlobalConfig = {
   slug: 'custom-css',
@@ -11,6 +12,9 @@ export const CustomCSS: GlobalConfig = {
   access: {
     read: isPublic,
     update: isAdmin, // Restricted: bad CSS can break the entire frontend
+  },
+  hooks: {
+    afterChange: [revalidateGlobalOnChange],
   },
   fields: [
     {

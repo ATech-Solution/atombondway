@@ -6,7 +6,7 @@ import { Link } from '@/i18n/navigation'
 import { getPayloadClient } from '@/lib/payload'
 
 export const revalidate = 3600
-import { absoluteUrl } from '@/lib/utils'
+import { buildSeoMetadata } from '@/lib/seo'
 import PageBanner from '@/components/ui/PageBanner'
 
 const PER_PAGE = 9
@@ -20,19 +20,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, categorySlug } = await params
   const loc = locale as 'en' | 'zh'
   const payload = await getPayloadClient()
-  const { docs } = await payload
-    .find({ collection: 'product-categories', where: { slug: { equals: categorySlug } }, locale: loc, limit: 1 })
-    .catch(() => ({ docs: [] }))
-  const label = (docs[0] as any)?.title ?? categorySlug
-  return {
-    title: `${label} | Atom Bondway`,
-    description: `Browse all ${label} products from Atom Bondway — official distributor in Hong Kong.`,
-    alternates: {
-      canonical: absoluteUrl(locale === 'en'
-        ? `/products/category/${categorySlug}`
-        : `/${locale}/products/category/${categorySlug}`),
-    },
-  }
+  const [{ docs }, siteSettings] = await Promise.all([
+    payload
+      .find({ collection: 'product-categories', where: { slug: { equals: categorySlug } }, locale: loc, limit: 1 })
+      .catch(() => ({ docs: [] })),
+    payload.findGlobal({ slug: 'site-settings', locale: loc }).catch(() => null),
+  ])
+  const category = docs[0] as any
+  const label = category?.title ?? categorySlug
+  const ss = siteSettings as any
+
+  return buildSeoMetadata({
+    locale,
+    path: `/products/category/${categorySlug}`,
+    meta: category?.meta,
+    defaults: { ...ss?.defaultMeta, noindex: ss?.noindex, companyName: ss?.companyName },
+    fallbackTitle: label,
+    fallbackDescription: loc === 'zh'
+      ? `瀏覽力新邦威所有 ${label} 產品`
+      : `Browse all ${label} products from Atom Bondway — official distributor in Hong Kong.`,
+  })
 }
 
 export default async function ProductCategoryPage({ params, searchParams }: Props) {

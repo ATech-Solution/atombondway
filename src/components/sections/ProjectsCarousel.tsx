@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
-import { Link } from '@/i18n/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Project {
@@ -22,6 +22,7 @@ const SLIDE_INTERVAL = 4000 // ms between auto-advances
 const VISIBLE = { desktop: 4, tablet: 2, mobile: 1 }
 
 export default function ProjectsCarousel({ projects, locale }: Props) {
+  const router = useRouter()
   const [index, setIndex] = useState(0)
   const [dragging, setDragging] = useState(false)
   const [dragDelta, setDragDelta] = useState(0)
@@ -73,7 +74,11 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
   }, [maxIndex])
 
   // Pointer drag (mouse + touch)
+  // setPointerCapture keeps all pointer events routed to this element even when
+  // the pointer moves over child nodes (Image, Link) or outside the window —
+  // this prevents the drag from being abruptly cancelled mid-swipe.
   const onPointerDown = (e: React.PointerEvent) => {
+    e.currentTarget.setPointerCapture(e.pointerId)
     draggingRef.current = true
     didDragRef.current = false
     dragStartRef.current = e.clientX
@@ -86,19 +91,35 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
     if (!draggingRef.current) return
     const delta = e.clientX - dragStartRef.current
     dragDeltaRef.current = delta
-    if (Math.abs(delta) > 5) didDragRef.current = true
+    // 10px threshold: distinguishes intentional swipes from small tap wobble
+    if (Math.abs(delta) > 10) didDragRef.current = true
     setDragDelta(delta)
   }
 
-  const onPointerUp = () => {
+  const onClick = (e: React.PointerEvent) => {
     if (!draggingRef.current) return
+    e.currentTarget.releasePointerCapture(e.pointerId)
     draggingRef.current = false
     setDragging(false)
     setDragDelta(0)
     const delta = dragDeltaRef.current
     dragDeltaRef.current = 0
-    if (delta < -60) { advance(1); resetTimer() }
-    else if (delta > 60) { advance(-1); resetTimer() }
+
+    if (delta < -60) { advance(1); resetTimer(); return }
+    if (delta > 60) { advance(-1); resetTimer(); return }
+
+    // Clean tap — find the card under the pointer.
+    // e.target is always the capturing element (the flex container) while
+    // setPointerCapture is active, so use elementFromPoint to get the real element.
+    if (!didDragRef.current) {
+      const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
+      const card = el?.closest<HTMLElement>('[data-project-slug]')
+      if (card) {
+        const slug = card.dataset.projectSlug
+        router.push(slug !== '#' ? (`/projects/${slug}` as any) : '/projects')
+      }
+    }
+    didDragRef.current = false
   }
 
   const handleArrow = (dir: 1 | -1) => {
@@ -121,12 +142,12 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
           style={{
             transform: `translateX(${translateX}%)`,
             transition: dragging ? 'none' : 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            cursor: dragging ? 'grabbing' : 'grab',
+            cursor: dragging ? 'grabbing' : 'pointer',
           }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerLeave={onPointerUp}
+          onPointerUp={onClick}
+          onPointerCancel={onClick}
         >
           {projects.map((p) => (
             <div
@@ -134,29 +155,27 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
               className="shrink-0 px-2"
               style={{ width: `${cardWidth}%` }}
             >
-              <Link
-                href={p.slug !== '#' ? (`/projects/${p.slug}` as any) : ('/projects' as any)}
-                className="group block bg-white overflow-hidden shadow-sm  transition-shadow"
-                // hover:shadow-md
-                draggable={false}
-                onClick={(e) => { if (didDragRef.current) { didDragRef.current = false; e.preventDefault() } }}
+              {/* data-project-slug is read by onPointerUp to navigate on clean tap */}
+              <div
+                data-project-slug={p.slug}
+                className="group block bg-white overflow-hidden shadow-sm transition-shadow"
               >
-                <div className="relative overflow-hidden" style={{ height: 180 }}>
-                  <Image
-                    src={p.imgSrc}
-                    alt={p.imgAlt}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
-                    sizes="(max-width:640px)100vw,(max-width:1024px)50vw,25vw"
-                    draggable={false}
-                  />
-                </div>
-                <div className="px-3 py-2 border-t border-gray-100">
-                  <h3 className="section-title text-base uppercase text-center text-[#10242b] font-normal group-hover:text-[#034F98] transition-colors leading-snug">
-                    {p.title}
-                  </h3>
-                </div>
-              </Link>
+                  <div className="relative overflow-hidden" style={{ height: 180 }}>
+                    <Image
+                      src={p.imgSrc}
+                      alt={p.imgAlt}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+                      sizes="(max-width:640px)100vw,(max-width:1024px)50vw,25vw"
+                      draggable={false}
+                    />
+                  </div>
+                  <div className="px-3 py-2 border-t border-gray-100">
+                    <h3 className="section-title text-base uppercase text-center text-[#10242b] font-normal group-hover:text-[#034F98] transition-colors leading-snug">
+                      {p.title}
+                    </h3>
+                  </div>
+              </div>
             </div>
           ))}
         </div>

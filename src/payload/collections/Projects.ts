@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { isAuthenticated, isPublic } from '../access/index.ts'
 import { seoFields } from '../fields/seoFields.ts'
 import { slugField } from '../fields/slugField.ts'
+import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate.ts'
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
@@ -16,6 +17,10 @@ export const Projects: CollectionConfig = {
     create: isAuthenticated,
     update: isAuthenticated,
     delete: isAuthenticated,
+  },
+  hooks: {
+    afterChange: [revalidateOnChange],
+    afterDelete: [revalidateOnDelete],
   },
   fields: [
     {

@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { isAuthenticated, isPublic } from '../access/index.ts'
+import { revalidateGlobalOnChange } from '../hooks/revalidate.ts'
 
 export const Navigation: GlobalConfig = {
   slug: 'navigation',
@@ -11,6 +12,9 @@ export const Navigation: GlobalConfig = {
   access: {
     read: isPublic,
     update: isAuthenticated,
+  },
+  hooks: {
+    afterChange: [revalidateGlobalOnChange],
   },
   fields: [
     {

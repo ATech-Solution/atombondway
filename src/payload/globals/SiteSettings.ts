@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { isAuthenticated, isPublic } from '../access/index.ts'
+import { revalidateGlobalOnChange } from '../hooks/revalidate.ts'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -11,6 +12,9 @@ export const SiteSettings: GlobalConfig = {
   access: {
     read: isPublic,
     update: isAuthenticated,
+  },
+  hooks: {
+    afterChange: [revalidateGlobalOnChange],
   },
   fields: [
     {
@@ -109,22 +113,6 @@ export const SiteSettings: GlobalConfig = {
       admin: {
         description: 'When enabled, adds a noindex meta tag to all pages, preventing search engines from indexing the site.',
       },
-    },
-    {
-      name: 'socialLinks',
-      type: 'group',
-      label: 'Social Media Links',
-      admin: {
-        description: 'Enter full URLs including https:// for each platform.',
-      },
-      fields: [
-        { name: 'facebook', type: 'text', label: 'Facebook URL' },
-        { name: 'linkedin', type: 'text', label: 'LinkedIn URL' },
-        { name: 'twitter', type: 'text', label: 'Twitter / X URL' },
-        { name: 'instagram', type: 'text', label: 'Instagram URL' },
-        { name: 'youtube', type: 'text', label: 'YouTube URL' },
-        { name: 'whatsapp', type: 'text', label: 'WhatsApp Number (with country code)' },
-      ],
     },
   ],
 }

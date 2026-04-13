@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, Clock } from 'lucide-react'
 import { useLocale } from 'next-intl'
 
 interface Props {
@@ -29,7 +29,8 @@ export default function Footer({ siteSettings, footerSettings, locale }: Props) 
   const fax     = footerSettings?.fax || 'fax'
   const email   = footerSettings?.email || 'email'
   const mapsUrl = 'https://www.google.com/maps/place/Yam+Tze+Commercial+Building,+17-23+Thomson+Rd,+Wan+Chai/@22.2772118,114.1688945,17z'
-  const showContactInfo = footerSettings?.showContactInfo !== false && (address || phone || fax || email)
+  const businessHours = footerSettings?.businessHours || ''
+  const showContactInfo = footerSettings?.showContactInfo !== false && (address || phone || fax || email || businessHours)
   const year        = new Date().getFullYear()
   const companyName = siteSettings?.companyName || 'Atom Bondway Company Limited'
   const copyright   =
@@ -85,12 +86,18 @@ export default function Footer({ siteSettings, footerSettings, locale }: Props) 
                     {(phone || fax) && (
                       <p>
                         {phone && <>
-                          {telText} 
+                          {telText}{` `}
                           <a href={`tel:${phone.replace(/\s/g, '')}`} className="hover:text-[#034F98] transition-colors">{phone}</a></>}
                         {phone && fax && ' / '}
                         {fax && <>
-                          {faxText} 
+                          {faxText}{` `}
                           {fax}</>}
+                      </p>
+                    )}
+                    {businessHours && (
+                      <p className="flex items-start gap-1.5 whitespace-pre-line">
+                        {/* <Clock size={15} className="mt-0.5 shrink-0 text-[#034F98]" /> */}
+                        <span>{businessHours}</span>
                       </p>
                     )}
                   </div>

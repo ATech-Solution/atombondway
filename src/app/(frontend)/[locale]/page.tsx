@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { setRequestLocale } from 'next-intl/server'
 import { getPayloadClient } from '@/lib/payload'
+import { buildSeoMetadata } from '@/lib/seo'
 
 export const revalidate = 3600
-import { absoluteUrl } from '@/lib/utils'
 import HeroSection from '@/components/sections/HeroSection'
 import RecentProjectsSection from '@/components/sections/RecentProjectsSection'
 import FeaturedProductsSection from '@/components/sections/FeaturedProductsSection'
@@ -23,35 +23,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     payload.findGlobal({ slug: 'site-settings', locale: payloadLocale }).catch(() => null),
   ])
 
-  // SEO priority: homepage SEO fields → site defaultMeta → companyName fallback
   const pageSeo = homePage as any
-  const defaultMeta = (siteSettings as any)?.defaultMeta
-  const companyName = (siteSettings as any)?.companyName || 'Company'
+  const ss = siteSettings as any
 
-  const title = pageSeo?.seoTitle || defaultMeta?.title || companyName
-  const description = pageSeo?.seoDescription || defaultMeta?.description || ''
-  const keywords = pageSeo?.seoKeywords || defaultMeta?.keywords
-  const ogImageUrl = pageSeo?.seoOgImage?.url || defaultMeta?.ogImage?.url
-  const noindex = (siteSettings as any)?.noindex === true
-
-  return {
-    title,
-    description,
-    keywords,
-    robots: noindex ? 'noindex, nofollow' : 'index, follow',
-    alternates: {
-      canonical: absoluteUrl(locale === 'en' ? '/' : `/${locale}`),
-      languages: {
-        en: absoluteUrl('/'),
-        zh: absoluteUrl('/zh'),
-      },
+  return buildSeoMetadata({
+    locale,
+    path: '/',
+    meta: {
+      title: pageSeo?.seoTitle,
+      description: pageSeo?.seoDescription,
+      keywords: pageSeo?.seoKeywords,
+      ogImage: pageSeo?.seoOgImage,
+      noIndex: null,
     },
-    openGraph: {
-      title,
-      description,
-      images: ogImageUrl ? [ogImageUrl] : [],
+    defaults: {
+      ...ss?.defaultMeta,
+      noindex: ss?.noindex,
+      companyName: ss?.companyName,
     },
-  }
+  })
 }
 
 export default async function HomePageRoute({ params }: Props) {

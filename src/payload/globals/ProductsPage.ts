@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { isAuthenticated, isPublic } from '../access/index.ts'
+import { revalidateGlobalOnChange } from '../hooks/revalidate.ts'
 import { seoFields } from '../fields/seoFields.ts'
 
 export const ProductsPage: GlobalConfig = {
@@ -12,6 +13,9 @@ export const ProductsPage: GlobalConfig = {
   access: {
     read: isPublic,
     update: isAuthenticated,
+  },
+  hooks: {
+    afterChange: [revalidateGlobalOnChange],
   },
   fields: [
     {

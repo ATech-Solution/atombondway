@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { isAuthenticated, isPublic } from '../access/index.ts'
+import { revalidateGlobalOnChange } from '../hooks/revalidate.ts'
 
 export const FooterSettings: GlobalConfig = {
   slug: 'footer-settings',
@@ -11,6 +12,9 @@ export const FooterSettings: GlobalConfig = {
   access: {
     read: isPublic,
     update: isAuthenticated,
+  },
+  hooks: {
+    afterChange: [revalidateGlobalOnChange],
   },
   fields: [
     {
@@ -61,16 +65,7 @@ export const FooterSettings: GlobalConfig = {
               label: 'Google Maps Embed URL',
               admin: {
                 description:
-                  'Go to Google Maps → Share → Embed a map → Copy only the src="..." URL from the iframe code.',
-              },
-            },
-            {
-              name: 'contactFormEnabled',
-              type: 'checkbox',
-              label: 'Show Contact Form',
-              defaultValue: true,
-              admin: {
-                description: 'Display the contact form on the Contact page.',
+                  'Give link to icon contact section Footer Top. Go to Google Maps → Share → Embed a map → Copy only the src="..." URL from the iframe code.',
               },
             },
             {

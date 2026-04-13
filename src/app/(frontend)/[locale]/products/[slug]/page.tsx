@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { getPayloadClient } from '@/lib/payload'
 
 export const revalidate = 3600
-import { absoluteUrl } from '@/lib/utils'
+import { buildSeoMetadata } from '@/lib/seo'
 import { Link } from '@/i18n/navigation'
 import RichText from '@/components/ui/RichText'
 import PageBanner from '@/components/ui/PageBanner'
@@ -20,12 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .catch(() => ({ docs: [] }))
   if (!docs[0]) return { title: 'Product Not Found' }
   const product = docs[0] as any
-  return {
-    title: product.meta?.title || product.name,
-    description: product.meta?.description || product.tagline,
-    openGraph: { images: product.image?.url ? [product.image.url] : [] },
-    alternates: { canonical: absoluteUrl(locale === 'en' ? `/products/${slug}` : `/${locale}/products/${slug}`) },
-  }
+
+  return buildSeoMetadata({
+    locale,
+    path: `/products/${slug}`,
+    meta: {
+      ...product.meta,
+      ogImage: product.meta?.ogImage ?? product.image,
+    },
+    fallbackTitle: product.name,
+    fallbackDescription: product.tagline,
+  })
 }
 
 export default async function ProductDetailPage({ params }: Props) {

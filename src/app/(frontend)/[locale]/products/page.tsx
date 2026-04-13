@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation'
 import { getPayloadClient } from '@/lib/payload'
 
 export const revalidate = 3600
-import { absoluteUrl } from '@/lib/utils'
+import { buildSeoMetadata } from '@/lib/seo'
 import PageBanner from '@/components/ui/PageBanner'
 
 type Props = { params: Promise<{ locale: string }> }
@@ -20,25 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     payload.findGlobal({ slug: 'site-settings', locale: loc }).catch(() => null),
   ])
 
-  const meta = (page as any)?.meta
-  const defaultMeta = (siteSettings as any)?.defaultMeta
-  const pageTitle = (page as any)?.pageTitle || (loc === 'zh' ? '我們的產品' : 'Our Products')
-  const pageSubtitle = (page as any)?.pageSubtitle || ''
+  const p = page as any
+  const ss = siteSettings as any
 
-  return {
-    title: meta?.title || pageTitle,
-    description: meta?.description || pageSubtitle || defaultMeta?.description,
-    keywords: meta?.keywords || defaultMeta?.keywords,
-    alternates: {
-      canonical: absoluteUrl(locale === 'en' ? '/products' : `/${locale}/products`),
-      languages: { en: absoluteUrl('/products'), zh: absoluteUrl('/zh/products') },
-    },
-    openGraph: {
-      title: meta?.title || pageTitle,
-      description: meta?.description || pageSubtitle || '',
-      images: meta?.ogImage?.url ? [meta.ogImage.url] : [],
-    },
-  }
+  return buildSeoMetadata({
+    locale,
+    path: '/products',
+    meta: p?.meta,
+    defaults: { ...ss?.defaultMeta, noindex: ss?.noindex, companyName: ss?.companyName },
+    fallbackTitle: p?.pageTitle || (loc === 'zh' ? '我們的產品' : 'Our Products'),
+    fallbackDescription: p?.pageSubtitle,
+  })
 }
 
 export default async function ProductsPage({ params }: Props) {
@@ -83,8 +75,10 @@ export default async function ProductsPage({ params }: Props) {
       {/* ── Page header ── */}
       <div className="border-b border-gray-100 bg-[#f8f9fb]">
         <div className="max-w-7xl mx-auto px-6 py-12 md:py-16">
-          <h1 className="page-title font-bold text-[#10242b] text-center mb-4">{pageTitle}</h1>
-          {/* {pageSubtitle && (<p className="text-[#000] text-center py-3">{pageSubtitle}</p>)} */}
+          <div className="mb-12">
+            <h1 className="page-title-have-into font-bold text-[#10242b] text-center">{pageTitle}</h1>
+            {pageSubtitle && (<p className="text-[#000] text-center py-3">{pageSubtitle}</p>)}
+          </div>
 
           {/* Category quick-links → dedicated category pages */}
           {catSections.length > 1 && (

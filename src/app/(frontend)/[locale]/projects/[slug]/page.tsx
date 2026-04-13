@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { getPayloadClient } from '@/lib/payload'
 
 export const revalidate = 3600
-import { absoluteUrl } from '@/lib/utils'
+import { buildSeoMetadata } from '@/lib/seo'
 import { Link } from '@/i18n/navigation'
 import PageBanner from '@/components/ui/PageBanner'
 
@@ -20,16 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!docs[0]) return { title: 'Project Not Found' }
   const project = docs[0] as any
-  return {
-    title: project.meta?.title || project.title,
-    description: project.meta?.description || project.summary,
-    openGraph: {
-      images: project.coverImage?.url ? [project.coverImage.url] : [],
+
+  return buildSeoMetadata({
+    locale,
+    path: `/projects/${slug}`,
+    meta: {
+      ...project.meta,
+      ogImage: project.meta?.ogImage ?? project.coverImage,
     },
-    alternates: {
-      canonical: absoluteUrl(locale === 'en' ? `/projects/${slug}` : `/${locale}/projects/${slug}`),
-    },
-  }
+    fallbackTitle: project.title,
+    fallbackDescription: project.summary,
+  })
 }
 
 export default async function ProjectDetailPage({ params }: Props) {

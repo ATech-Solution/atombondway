@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { isAuthenticated, isPublic } from '../access/index.ts'
+import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate.ts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -42,10 +43,10 @@ export const Media: CollectionConfig = {
     delete: isAuthenticated,
   },
   hooks: {
-    afterRead: [
+    afterChange: [
+      revalidateOnChange,
       ({ doc }) => {
-        if (!doc || typeof doc !== 'object') return doc
-
+        // Ensure URLs are normalized after creation/update
         if (typeof doc.url === 'string') {
           doc.url = normalizeMediaUrl(doc.url)
         }
@@ -61,9 +62,11 @@ export const Media: CollectionConfig = {
         return doc
       },
     ],
-    afterChange: [
+    afterDelete: [revalidateOnDelete],
+    afterRead: [
       ({ doc }) => {
-        // Ensure URLs are normalized after creation/update
+        if (!doc || typeof doc !== 'object') return doc
+
         if (typeof doc.url === 'string') {
           doc.url = normalizeMediaUrl(doc.url)
         }

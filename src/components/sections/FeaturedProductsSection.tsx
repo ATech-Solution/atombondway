@@ -45,7 +45,7 @@ export default function FeaturedProductsSection({ products, locale, homePageData
             {items.slice(0, 3).map((item: any, idx: number) => {
               const slug = item.categorySlug || 'silicone-sealants'
               const catInfo = CATEGORY_LABELS[slug]
-              const label = item.label || (loc === 'zh' ? catInfo?.zh : catInfo?.en) || slug
+              const label = item.label || (loc === 'zh' ? catInfo?.zh : catInfo?.en)
               const imgSrc = getMediaUrl(item.image) || catInfo?.image || '/images/product-sealants.jpg'
               return (
                 <div key={idx} className="flex flex-col">

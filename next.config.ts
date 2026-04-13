@@ -36,12 +36,18 @@ const nextConfig: NextConfig = {
       { pathname: '/media/**', search: '' },
     ],
     remotePatterns: [
-      // Dev: Payload serves absolute URLs via its API endpoint
+      // Dev: Payload serves absolute URLs via its API or static endpoint
       {
         protocol: 'http',
         hostname: 'localhost',
         port: '3000',
         pathname: '/api/media/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+        pathname: '/media/**',
       },
       // Production: allow the configured site hostname
       ...(productionHostname
