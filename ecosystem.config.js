@@ -11,7 +11,7 @@ module.exports = {
       name: 'company-profile',
       script: './node_modules/.bin/next',
       args: 'start',
-      cwd: '/var/www/compro',       // Change to your deployment path
+      cwd: '/home/deploy/atombondway/',       // Change to your deployment path
       instances: 1,                  // Must be 1 for SQLite
       exec_mode: 'fork',             // Must be fork (not cluster) for SQLite
       autorestart: true,
