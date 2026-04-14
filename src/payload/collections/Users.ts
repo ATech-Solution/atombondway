@@ -48,6 +48,7 @@ const buildResetPasswordEmailHTML = (token: string): string => {
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: {
+    // disableLocalStrategy: true,
     tokenExpiration: 7200, // 2 hours
     verify: false,
     // tokenExpiration: 7200, // 2 hours
@@ -63,6 +64,11 @@ export const Users: CollectionConfig = {
     // forgotPassword: {
     //   generateEmailHTML: (args) =>
     //     buildResetPasswordEmailHTML((args?.token ?? '') as string),
+    // },
+    // forgotPassword: {
+    //   generateEmailHTML: ({ req, token, user }) => {
+    //     return `<h1>Custom Email</h1><p>Reset link: ${process.env.SERVER_URL}/reset/${token}</p>`;
+    //   },
     // },
   },
   admin: {
