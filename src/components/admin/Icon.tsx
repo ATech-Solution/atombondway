@@ -5,9 +5,9 @@ export function AdminIcon() {
     <div
       style={{
         width: 50,
-        height: 50,
+        height: 32,
         borderRadius: 8,
-        // background: 'linear-gradient(135deg, #034F98 0%, #3c97eb 100%)',
+        background: 'linear-gradient(135deg, #034F98 0%, #3c97eb 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

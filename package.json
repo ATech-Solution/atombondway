@@ -14,7 +14,11 @@
     "generate:importmap": "NODE_OPTIONS='--import tsx' payload generate:importmap",
     "payload": "NODE_OPTIONS='--import tsx' payload",
     "migrate:create": "NODE_OPTIONS='--import tsx' payload migrate:create",
-    "migrate": "NODE_OPTIONS='--import tsx' payload migrate"
+    "migrate": "NODE_OPTIONS='--import tsx' payload migrate",
+    "clean": "rm -rf .next node_modules",
+    "rebuild": "rm -rf .next node_modules && next build",
+    "redb": "payload migrate:create && payload migrate",
+    "regen": "payload generate:types && payload generate:importmap"
   },
   "dependencies": {
     "@payloadcms/db-sqlite": "3.33.0",

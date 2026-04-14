@@ -827,9 +827,11 @@ export interface HomePage {
    */
   featuredCategoryLinks?:
     | {
-        categorySlug: 'silicone-sealants' | 'spacer-tapes' | 'suction-grip' | 'backer-rod';
+        /**
+         * Select from the Product Categories collection.
+         */
+        categorySlug?: (number | null) | ProductCategory;
         label?: string | null;
-        image?: (number | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -1272,7 +1274,6 @@ export interface HomePageSelect<T extends boolean = true> {
     | {
         categorySlug?: T;
         label?: T;
-        image?: T;
         id?: T;
       };
   servicesSectionTitle?: T;

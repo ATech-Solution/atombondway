@@ -153,27 +153,18 @@ export const HomePage: GlobalConfig = {
               fields: [
                 {
                   name: 'categorySlug',
-                  type: 'select',
+                  type: 'relationship',
                   label: 'Product Category',
-                  required: true,
-                  options: [
-                    { label: 'DOWSIL™ Sealants', value: 'silicone-sealants' },
-                    { label: 'Saint-Gobain Spacer Tapes', value: 'spacer-tapes' },
-                    { label: "Wood's Powr-Grip", value: 'suction-grip' },
-                    { label: 'Backer Rod', value: 'backer-rod' },
-                  ],
+                  relationTo: 'product-categories',
+                  admin: {
+                    description: 'Select from the Product Categories collection.',
+                  },
                 },
                 {
                   name: 'label',
                   type: 'text',
                   label: 'Display Label (overrides default category name)',
                   localized: true,
-                },
-                {
-                  name: 'image',
-                  type: 'upload',
-                  label: 'Card Image',
-                  relationTo: 'media',
                 },
               ],
             },
