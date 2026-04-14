@@ -49,19 +49,21 @@ export const Users: CollectionConfig = {
   slug: 'users',
   auth: {
     tokenExpiration: 7200, // 2 hours
-    // Only require email verification when AWS SES is configured.
-    // Without a real email transport, verification emails can't be sent
-    // and users would be permanently locked out.
-    verify: process.env.AWS_SES_SMTP_USER
-      ? {
-          generateEmailHTML: ({ token, user }) =>
-            buildVerifyEmailHTML(user as User, token as string),
-        }
-      : false,
-    forgotPassword: {
-      generateEmailHTML: (args) =>
-        buildResetPasswordEmailHTML((args?.token ?? '') as string),
-    },
+    verify: false,
+    // tokenExpiration: 7200, // 2 hours
+    // // Only require email verification when AWS SES is configured.
+    // // Without a real email transport, verification emails can't be sent
+    // // and users would be permanently locked out.
+    // verify: process.env.AWS_SES_SMTP_USER
+    //   ? {
+    //       generateEmailHTML: ({ token, user }) =>
+    //         buildVerifyEmailHTML(user as User, token as string),
+    //     }
+    //   : false,
+    // forgotPassword: {
+    //   generateEmailHTML: (args) =>
+    //     buildResetPasswordEmailHTML((args?.token ?? '') as string),
+    // },
   },
   admin: {
     useAsTitle: 'email',

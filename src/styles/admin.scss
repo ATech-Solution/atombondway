@@ -37,3 +37,8 @@
 .template-minimal__wrap {
   border-top: 3px solid #034F98;
 }
+
+// Hide "Forgot password?" link on login page
+.login__forgot-password {
+  display: none !important;
+}
