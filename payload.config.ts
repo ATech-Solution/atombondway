@@ -49,7 +49,7 @@ const allowedOrigins = Array.from(new Set([payloadServerUrl, siteUrl, ...localDe
  */
 const emailTransport = process.env.AWS_SES_SMTP_USER
   ? nodemailer.createTransport({
-      host: process.env.AWS_SES_SMTP_HOST || 'email-smtp.us-east-1.amazonaws.com',
+      host: process.env.AWS_SES_SMTP_HOST || 'smtp.ap-southeast-1.amazonaws.com',
       port: parseInt(process.env.AWS_SES_SMTP_PORT || '465'),
       secure: true,
       auth: {
