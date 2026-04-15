@@ -28,6 +28,12 @@ export const ProjectCategory: CollectionConfig = {
       label: 'Category Name',
       required: true,
       localized: true,
+      validate: (value: string | null | undefined) => {
+        if (!value || value.trim().length === 0) return 'Category name is required.'
+        if (value.trim().length < 2) return 'Category name must be at least 2 characters.'
+        if (value.length > 100) return `Category name is too long (${value.length} characters). Keep it under 100 characters.`
+        return true
+      },
     },
     slugField('title'),
     {
@@ -44,6 +50,13 @@ export const ProjectCategory: CollectionConfig = {
       type: 'textarea',
       label: 'Description',
       localized: true,
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.length > 500) {
+          return `Description is too long (${value.length} characters). Keep it under 500 characters.`
+        }
+        return true
+      },
     },
   ],
 }

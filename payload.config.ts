@@ -15,13 +15,9 @@ import { Projects } from './src/payload/collections/Projects.ts'
 import { ProjectCategory } from './src/payload/collections/ProjectCategory.ts'
 import { Products } from './src/payload/collections/Products.ts'
 import { ProductCategory } from './src/payload/collections/ProductCategory.ts'
-// import { Services } from './src/payload/collections/Services.ts'
 
 import { Navigation } from './src/payload/globals/Navigation.ts'
 import { SiteSettings } from './src/payload/globals/SiteSettings.ts'
-// import { HeroContent } from './src/payload/globals/HeroContent.ts'
-// import { AboutContent } from './src/payload/globals/AboutContent.ts'
-// import { ContactInfo } from './src/payload/globals/ContactInfo.ts'
 import { FooterSettings } from './src/payload/globals/FooterSettings.ts'
 import { CustomCSS } from './src/payload/globals/CustomCSS.ts'
 
@@ -97,8 +93,6 @@ export default buildConfig({
   csrf: allowedOrigins,
 
   // Collections & Globals
-  // collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory, Services],
-  // globals: [SiteSettings, HeroContent, AboutContent, ContactInfo, Navigation, ProductsPage, ProjectsPage, ServicesPage, AboutPage, FooterSettings, CustomCSS, HomePage],
   collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory],
   globals: [SiteSettings, Navigation, HomePage, ProductsPage, ProjectsPage, ServicesPage, AboutPage, FooterSettings, CustomCSS],
 

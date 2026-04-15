@@ -124,12 +124,27 @@ export const Media: CollectionConfig = {
       admin: {
         description: 'Describe the image for accessibility and SEO. Not required for PDFs.',
       },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true // optional — PDFs don't need alt text
+        if (value.trim().length < 3) return 'Alt text must be at least 3 characters to be meaningful.'
+        if (value.length > 300) {
+          return `Alt text is too long (${value.length} characters). Keep it under 300 characters — be concise.`
+        }
+        return true
+      },
     },
     {
       name: 'caption',
       type: 'text',
       label: 'Caption',
       localized: true,
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.length > 300) {
+          return `Caption is too long (${value.length} characters). Keep it under 300 characters.`
+        }
+        return true
+      },
     },
   ],
 }

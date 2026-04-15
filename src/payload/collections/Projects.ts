@@ -29,6 +29,12 @@ export const Projects: CollectionConfig = {
       label: 'Project Title',
       required: true,
       localized: true,
+      validate: (value: string | null | undefined) => {
+        if (!value || value.trim().length === 0) return 'Project title is required.'
+        if (value.trim().length < 2) return 'Project title must be at least 2 characters.'
+        if (value.length > 200) return `Project title is too long (${value.length} characters). Keep it under 200 characters.`
+        return true
+      },
     },
     slugField('title'),
     {
@@ -38,6 +44,13 @@ export const Projects: CollectionConfig = {
       localized: true,
       admin: {
         description: 'Brief description shown in cards and listings (1–2 sentences).',
+      },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.length > 400) {
+          return `Summary is too long (${value.length} characters). Keep it under 400 characters — it should be 1–2 sentences.`
+        }
+        return true
       },
     },
     {
@@ -81,6 +94,12 @@ export const Projects: CollectionConfig = {
       label: 'Architect',
       localized: true,
       admin: { position: 'sidebar' },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.trim().length < 2) return 'Architect name must be at least 2 characters.'
+        if (value.length > 150) return `Architect name is too long (${value.length} characters). Keep it under 150 characters.`
+        return true
+      },
     },
     {
       name: 'developer',
@@ -88,12 +107,24 @@ export const Projects: CollectionConfig = {
       label: 'Developer',
       localized: true,
       admin: { position: 'sidebar' },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.trim().length < 2) return 'Developer name must be at least 2 characters.'
+        if (value.length > 150) return `Developer name is too long (${value.length} characters). Keep it under 150 characters.`
+        return true
+      },
     },
     {
       name: 'materialSupplied',
       type: 'text',
       label: 'Material Supplied',
       admin: { position: 'sidebar' },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.trim().length < 2) return 'Material supplied must be at least 2 characters.'
+        if (value.length > 200) return `Material supplied is too long (${value.length} characters). Keep it under 200 characters.`
+        return true
+      },
     },
     {
       name: 'buildingType',
@@ -101,6 +132,12 @@ export const Projects: CollectionConfig = {
       label: 'Building Type',
       localized: true,
       admin: { position: 'sidebar' },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.trim().length < 2) return 'Building type must be at least 2 characters.'
+        if (value.length > 100) return `Building type is too long (${value.length} characters). Keep it under 100 characters.`
+        return true
+      },
     },
     {
       name: 'location',
@@ -108,6 +145,12 @@ export const Projects: CollectionConfig = {
       label: 'Location',
       localized: true,
       admin: { position: 'sidebar' },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.trim().length < 2) return 'Location must be at least 2 characters.'
+        if (value.length > 200) return `Location is too long (${value.length} characters). Keep it under 200 characters.`
+        return true
+      },
     },
     {
       name: 'completionDate',
@@ -130,6 +173,13 @@ export const Projects: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Lower numbers appear first.',
+      },
+      validate: (value: number | null | undefined) => {
+        if (value === null || value === undefined) return true
+        if (!Number.isInteger(value)) return 'Sort order must be a whole number (e.g. 0, 1, 2).'
+        if (value < 0) return 'Sort order cannot be negative. Use 0 or a positive number.'
+        if (value > 9999) return 'Sort order cannot exceed 9999.'
+        return true
       },
     },
     {

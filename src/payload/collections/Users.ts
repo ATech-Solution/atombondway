@@ -48,28 +48,22 @@ const buildResetPasswordEmailHTML = (token: string): string => {
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: {
-    // disableLocalStrategy: true,
-    tokenExpiration: 7200, // 2 hours
-    verify: false,
     // tokenExpiration: 7200, // 2 hours
-    // // Only require email verification when AWS SES is configured.
-    // // Without a real email transport, verification emails can't be sent
-    // // and users would be permanently locked out.
-    // verify: process.env.AWS_SES_SMTP_USER
-    //   ? {
-    //       generateEmailHTML: ({ token, user }) =>
-    //         buildVerifyEmailHTML(user as User, token as string),
-    //     }
-    //   : false,
-    // forgotPassword: {
-    //   generateEmailHTML: (args) =>
-    //     buildResetPasswordEmailHTML((args?.token ?? '') as string),
-    // },
-    // forgotPassword: {
-    //   generateEmailHTML: ({ req, token, user }) => {
-    //     return `<h1>Custom Email</h1><p>Reset link: ${process.env.SERVER_URL}/reset/${token}</p>`;
-    //   },
-    // },
+    // verify: false,
+    tokenExpiration: 7200, // 2 hours
+    // Only require email verification when AWS SES is configured.
+    // Without a real email transport, verification emails can't be sent
+    // and users would be permanently locked out.
+    verify: process.env.AWS_SES_SMTP_USER
+      ? {
+          generateEmailHTML: ({ token, user }) =>
+            buildVerifyEmailHTML(user as User, token as string),
+        }
+      : false,
+    forgotPassword: {
+      generateEmailHTML: (args) =>
+        buildResetPasswordEmailHTML((args?.token ?? '') as string),
+    },
   },
   admin: {
     useAsTitle: 'email',
@@ -88,6 +82,13 @@ export const Users: CollectionConfig = {
       type: 'text',
       label: 'Full Name',
       required: true,
+      validate: (value: string | null | undefined) => {
+        if (!value || value.trim().length === 0) return 'Full name is required.'
+        if (value.trim().length < 2) return 'Full name must be at least 2 characters.'
+        if (value.length > 100) return `Full name is too long (${value.length} characters). Keep it under 100 characters.`
+        if (/^\d+$/.test(value.trim())) return 'Full name cannot be numbers only. Please enter a real name.'
+        return true
+      },
     },
     {
       name: 'role',
@@ -102,6 +103,11 @@ export const Users: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Admins can manage users. Editors can only manage content.',
+      },
+      validate: (value: string | null | undefined) => {
+        if (!value) return 'Role is required. Please select Admin or Editor.'
+        if (!['admin', 'editor'].includes(value)) return 'Invalid role. Please select Admin or Editor.'
+        return true
       },
     },
   ],

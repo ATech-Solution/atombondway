@@ -29,6 +29,12 @@ export const Products: CollectionConfig = {
       label: 'Product Name',
       required: true,
       localized: true,
+      validate: (value: string | null | undefined) => {
+        if (!value || value.trim().length === 0) return 'Product name is required.'
+        if (value.trim().length < 2) return 'Product name must be at least 2 characters.'
+        if (value.length > 150) return `Product name is too long (${value.length} characters). Keep it under 150 characters.`
+        return true
+      },
     },
     slugField('name'),
     {
@@ -38,6 +44,13 @@ export const Products: CollectionConfig = {
       localized: true,
       admin: {
         description: 'One-line description shown in cards.',
+      },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+        if (value.length > 200) {
+          return `Tagline is too long (${value.length} characters). Keep it under 200 characters — it should be a single line.`
+        }
+        return true
       },
     },
     {
@@ -95,6 +108,13 @@ export const Products: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Lower numbers appear first.',
+      },
+      validate: (value: number | null | undefined) => {
+        if (value === null || value === undefined) return true
+        if (!Number.isInteger(value)) return 'Sort order must be a whole number (e.g. 0, 1, 2).'
+        if (value < 0) return 'Sort order cannot be negative. Use 0 or a positive number.'
+        if (value > 9999) return 'Sort order cannot exceed 9999.'
+        return true
       },
     },
     ...seoFields,
