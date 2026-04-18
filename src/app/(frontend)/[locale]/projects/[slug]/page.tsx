@@ -126,7 +126,7 @@ export default async function ProjectDetailPage({ params }: Props) {
         )}   */}
         {/* Description */}        
         {project.description && (
-          <div className="mt-10 text-gray-600 text-sm leading-relaxed max-w-3xl">
+          <div className="mt-4 text-gray-600 text-sm leading-relaxed max-w-3xl">
             <RichText data={project.description} />
           </div>
         )}

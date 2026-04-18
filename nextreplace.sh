@@ -60,10 +60,16 @@ echo "🔧 Patching dev-machine paths in standalone bundle..."
 grep -rl "/Users/tansams/Documents/GitHub/atombondway" .next/standalone/ --include="*.js" 2>/dev/null \
   | xargs -r sed -i "s|/Users/tansams/Documents/GitHub/atombondway|/home/deploy/atombondway|g"
 
-echo "📂 Merging static assets into standalone bundle..."
+echo "📂 Copying JS/CSS chunks into standalone bundle..."
+# The zip puts static chunks at .next/static/ (top level) but the standalone server
+# expects them at .next/standalone/.next/static/. The standalone zip doesn't include
+# this subdir, so we must copy it. Destination doesn't exist yet → cp creates it correctly.
+cp -r .next/static .next/standalone/.next/static
+
+echo "📂 Merging public/ assets into standalone bundle..."
 # Use /. to copy directory CONTENTS into the existing .next/standalone/public/
-# (plain `cp -r public .next/standalone/public` would create a nested public/public/ dir
-# because the destination already exists from the build)
+# (plain `cp -r public .next/standalone/public` would create a nested public/public/
+# because the destination already exists from the build zip)
 cp -r public/. .next/standalone/public/
 
 echo "🔗 Symlinking media directory into standalone..."

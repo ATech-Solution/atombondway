@@ -30,6 +30,7 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
   const dragStartRef = useRef(0)
   const dragDeltaRef = useRef(0)
   const didDragRef = useRef(false)
+  const tapSlugRef = useRef<string | null>(null)
   const [perView, setPerView] = useState(VISIBLE.desktop)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -85,6 +86,10 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
     dragDeltaRef.current = 0
     setDragging(true)
     setDragDelta(0)
+    // Capture the tapped card's slug on pointerDown — e.target is the actual pressed
+    // element here (unaffected by pointer capture), unlike elementFromPoint on pointerUp.
+    const card = (e.target as HTMLElement).closest<HTMLElement>('[data-project-slug]')
+    tapSlugRef.current = card?.dataset.projectSlug ?? null
   }
 
   const onPointerMove = (e: React.PointerEvent) => {
@@ -111,15 +116,12 @@ export default function ProjectsCarousel({ projects, locale }: Props) {
     // Clean tap — find the card under the pointer.
     // e.target is always the capturing element (the flex container) while
     // setPointerCapture is active, so use elementFromPoint to get the real element.
-    if (!didDragRef.current) {
-      const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
-      const card = el?.closest<HTMLElement>('[data-project-slug]')
-      if (card) {
-        const slug = card.dataset.projectSlug
-        router.push(slug !== '#' ? (`/projects/${slug}` as any) : '/projects')
-      }
+    if (!didDragRef.current && tapSlugRef.current) {
+      const slug = tapSlugRef.current
+      router.push(slug !== '#' ? (`/projects/${slug}` as any) : '/projects')
     }
     didDragRef.current = false
+    tapSlugRef.current = null
   }
 
   const handleArrow = (dir: 1 | -1) => {
