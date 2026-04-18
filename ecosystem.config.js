@@ -22,6 +22,10 @@ module.exports = {
         PORT: 3000,
         HOSTNAME: '0.0.0.0',
         DATABASE_URL: 'file:/home/deploy/atombondway/data/payload.db',
+        // standalone/server.js runs process.chdir(__dirname) on startup, so process.cwd()
+        // becomes .next/standalone/ — not the project root. Use an absolute path so
+        // Payload always reads/writes media from the correct persistent location.
+        PAYLOAD_MEDIA_DIR: '/home/deploy/atombondway/public/media',
       },
     },
   ],

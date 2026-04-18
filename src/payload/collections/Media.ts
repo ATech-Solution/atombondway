@@ -4,9 +4,11 @@ import path from 'path'
 import { isAuthenticated, isPublic } from '../access/index.ts'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate.ts'
 
+// PAYLOAD_MEDIA_DIR must be an absolute path in production (standalone server.js calls
+// process.chdir(__dirname), so process.cwd() becomes .next/standalone/ not the project root).
 const mediaUploadDir = process.env.PAYLOAD_MEDIA_DIR
-  ? path.resolve(process.cwd(), process.env.PAYLOAD_MEDIA_DIR)
-  : path.resolve(process.cwd(), 'public/media')
+  ? path.resolve(process.env.PAYLOAD_MEDIA_DIR)   // absolute — ignore cwd entirely
+  : path.resolve(process.cwd(), 'public/media')    // dev fallback: cwd-relative
 
 if (!fs.existsSync(mediaUploadDir)) {
   fs.mkdirSync(mediaUploadDir, { recursive: true })

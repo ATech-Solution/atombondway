@@ -25,8 +25,8 @@ const buildVerifyEmailHTML = (user: User, token: string): string => {
   `
 }
 
-const buildResetPasswordEmailHTML = (token: string): string => {
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/admin/reset-password?token=${token}`
+const buildResetPasswordEmailHTML = (token: string, serverUrl: string): string => {
+  const url = `${serverUrl}/admin/reset-password?token=${token}`
   return `
     <!DOCTYPE html>
     <html>
@@ -62,7 +62,7 @@ export const Users: CollectionConfig = {
       : false,
     forgotPassword: {
       generateEmailHTML: (args) =>
-        buildResetPasswordEmailHTML((args?.token ?? '') as string),
+        buildResetPasswordEmailHTML((args?.token ?? '') as string, args?.req?.payload?.config?.serverURL ?? ''),
     },
   },
   admin: {

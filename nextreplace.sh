@@ -60,9 +60,18 @@ echo "🔧 Patching dev-machine paths in standalone bundle..."
 grep -rl "/Users/tansams/Documents/GitHub/atombondway" .next/standalone/ --include="*.js" 2>/dev/null \
   | xargs -r sed -i "s|/Users/tansams/Documents/GitHub/atombondway|/home/deploy/atombondway|g"
 
-echo "📂 Copying static assets into standalone bundle..."
-cp -r public .next/standalone/public
-cp -r .next/static .next/standalone/.next/static
+echo "📂 Merging static assets into standalone bundle..."
+# Use /. to copy directory CONTENTS into the existing .next/standalone/public/
+# (plain `cp -r public .next/standalone/public` would create a nested public/public/ dir
+# because the destination already exists from the build)
+cp -r public/. .next/standalone/public/
+
+echo "🔗 Symlinking media directory into standalone..."
+# standalone/server.js calls process.chdir(__dirname), so process.cwd() becomes
+# .next/standalone/ — NOT the project root. Symlink the persistent media dir into
+# the standalone public/ so Next.js static serving and Payload API both find the same files.
+rm -rf .next/standalone/public/media
+ln -sfn /home/deploy/atombondway/public/media .next/standalone/public/media
 
 echo "🔄 Restarting app..."
 pm2 stop company-profile || true
