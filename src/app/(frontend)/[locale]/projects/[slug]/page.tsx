@@ -8,6 +8,7 @@ export const revalidate = 3600
 import { buildSeoMetadata } from '@/lib/seo'
 import { Link } from '@/i18n/navigation'
 import PageBanner from '@/components/ui/PageBanner'
+import RichText from '@/components/ui/RichText'
 
 type Props = { params: Promise<{ locale: string; slug: string }> }
 
@@ -57,13 +58,13 @@ export default async function ProjectDetailPage({ params }: Props) {
   }
 
   // Metadata rows (right column) — only show if value exists
+  const catTitle = typeof project.projectCategory === 'object' ? project.projectCategory?.title : null
   const meta: { label: string; value: string }[] = []
+  if (catTitle)                 meta.push({ label: isZh ? '類別' : 'Category',             value: catTitle })
   if (project.architect)        meta.push({ label: isZh ? '建築師' : 'Architect',         value: project.architect })
   if (project.developer)        meta.push({ label: isZh ? '發展商' : 'Developer',          value: project.developer })
   if (project.materialSupplied) meta.push({ label: isZh ? '供應材料' : 'Material Supplied', value: project.materialSupplied })
   if (project.buildingType)     meta.push({ label: isZh ? '建築類型' : 'Building Type',     value: project.buildingType })
-  const catTitle = typeof project.projectCategory === 'object' ? project.projectCategory?.title : null
-  if (catTitle)                 meta.push({ label: isZh ? '類別' : 'Category',             value: catTitle })
 
   return (
     <div className="bg-white">
@@ -111,7 +112,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 {meta.map(({ label, value }) => (
                   <div key={label}>
                     <dt className="font-semibold text-[#10242b] mb-0.5">{label}</dt>
-                    <dd className="text-gray-600 leading-snug">{value}</dd>
+                    <dt className="text-gray-600 leading-snug">{value}</dt>
                   </div>
                 ))}
               </dl>
@@ -119,9 +120,15 @@ export default async function ProjectDetailPage({ params }: Props) {
           )}
         </div>
 
-        {/* Description */}
-        {project.summary && (
+        {/* Summary */}    
+        {/* {project.summary && (
           <p className="mt-10 text-gray-600 text-sm leading-relaxed max-w-3xl">{project.summary}</p>
+        )}   */}
+        {/* Description */}        
+        {project.description && (
+          <div className="mt-10 text-gray-600 text-sm leading-relaxed max-w-3xl">
+            <RichText data={project.description} />
+          </div>
         )}
 
         {/* Back link */}

@@ -27,8 +27,6 @@ import { ProjectsPage } from './src/payload/globals/ProjectsPage.ts'
 import { ServicesPage } from './src/payload/globals/ServicesPage.ts'
 import { AboutPage } from './src/payload/globals/AboutPage.ts'
 
-
-
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -57,12 +55,12 @@ const emailTransport = process.env.AWS_SES_SMTP_USER
         pass: process.env.AWS_SES_SMTP_PASSWORD,
       },
     })
-  : process.env.MAILPIT_HOST
-    ? nodemailer.createTransport({
-        host: process.env.MAILPIT_HOST,
-        port: parseInt(process.env.MAILPIT_PORT || '1025'),
-        secure: false,
-      })
+  // : process.env.MAILPIT_HOST
+  //   ? nodemailer.createTransport({
+  //       host: process.env.MAILPIT_HOST,
+  //       port: parseInt(process.env.MAILPIT_PORT || '1025'),
+  //       secure: false,
+  //     })
     // No email provider configured — use silent JSON transport (dev/seed mode)
     : nodemailer.createTransport({ jsonTransport: true })
 
@@ -75,7 +73,7 @@ export default buildConfig({
     //   ? { email: 'dev@atech.software', prefillOnly: false }
     //   : false,
     meta: {
-      titleSuffix: ' — Admin',
+      titleSuffix: ' — Atombondway Admin',
     },
     importMap: {
       baseDir: path.resolve(dirname),
