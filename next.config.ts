@@ -20,13 +20,11 @@ const mediaHostname = mediaBaseUrl
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  // Ensure Payload's OG font and config files are traced into the standalone bundle
+  // Payload OG route loads roboto-regular.woff via fs.readFile at runtime.
+  // The font isn't a JS import so Next.js file tracing misses it — include it explicitly.
+  // All Payload API calls go through (payload)/api/[...slug], which is where the OG handler runs.
   outputFileTracingIncludes: {
-    '/api/og': ['./node_modules/@payloadcms/next/dist/routes/rest/og/**'],
-    '/(payload)/admin/[[...segments]]': [
-      './node_modules/@payloadcms/next/dist/**',
-      './payload.config.ts',
-    ],
+    '/(payload)/api/[...slug]': ['./node_modules/@payloadcms/next/dist/routes/rest/og/**'],
   },
   turbopack: {},
   productionBrowserSourceMaps: false,

@@ -1,7 +1,6 @@
 import { buildConfig } from 'payload'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { en } from '@payloadcms/translations/languages/en'
 import { zh } from '@payloadcms/translations/languages/zh'
 import nodemailer from 'nodemailer'
@@ -40,29 +39,39 @@ const payloadServerUrl = envUrl('PAYLOAD_PUBLIC_SERVER_URL') || siteUrl
 const localDevUrls = ['http://localhost:3000', 'http://127.0.0.1:3000']
 const allowedOrigins = Array.from(new Set([payloadServerUrl, siteUrl, ...localDevUrls]))
 
-/**
- * Email transport:
- * - Production: AWS SES via SMTP (set AWS_SES_SMTP_USER in .env)
- * - Development/fallback: Mailpit (run: docker run -p 1025:1025 -p 8025:8025 axllent/mailpit)
- */
-const emailTransport = process.env.AWS_SES_SMTP_USER
-  ? nodemailer.createTransport({
-      host: process.env.AWS_SES_SMTP_HOST || 'smtp.ap-southeast-1.amazonaws.com',
-      port: parseInt(process.env.AWS_SES_SMTP_PORT || '465'),
-      secure: true,
-      auth: {
-        user: process.env.AWS_SES_SMTP_USER,
-        pass: process.env.AWS_SES_SMTP_PASSWORD,
-      },
-    })
-  // : process.env.MAILPIT_HOST
-  //   ? nodemailer.createTransport({
-  //       host: process.env.MAILPIT_HOST,
-  //       port: parseInt(process.env.MAILPIT_PORT || '1025'),
-  //       secure: false,
-  //     })
-    // No email provider configured — use silent JSON transport (dev/seed mode)
+// Resilient email adapter — send failures are logged but never thrown,
+// so auth operations (forgot-password, user create+verify) never return "Something went wrong"
+// due to an email transport error.
+const buildEmailAdapter = async () => {
+  const fromAddress = process.env.EMAIL_FROM || 'noreply@atombondway.com'
+  const fromName = process.env.EMAIL_FROM_NAME || 'Atombondway'
+
+  const transport = process.env.AWS_SES_SMTP_USER
+    ? nodemailer.createTransport({
+        host: process.env.AWS_SES_SMTP_HOST || 'email-smtp.ap-southeast-1.amazonaws.com',
+        port: parseInt(process.env.AWS_SES_SMTP_PORT || '465'),
+        secure: true,
+        auth: {
+          user: process.env.AWS_SES_SMTP_USER,
+          pass: process.env.AWS_SES_SMTP_PASSWORD,
+        },
+      })
     : nodemailer.createTransport({ jsonTransport: true })
+
+  return () => ({
+    name: 'nodemailer',
+    defaultFromAddress: fromAddress,
+    defaultFromName: fromName,
+    sendEmail: async (message: nodemailer.SendMailOptions) => {
+      try {
+        await transport.sendMail({ from: `${fromName} <${fromAddress}>`, ...message })
+      } catch (err) {
+        console.error('[Email] Failed to send to', message.to, err instanceof Error ? err.message : String(err))
+        // Intentionally swallowed — prevents transport errors from breaking forgot-password / user-verify
+      }
+    },
+  })
+}
 
 export default buildConfig({
   // Admin panel configuration
@@ -117,13 +126,8 @@ export default buildConfig({
   // Rich text editor
   editor: lexicalEditor(),
 
-  // Email: AWS SES (prod) or Mailpit (dev)
-  email: nodemailerAdapter({
-    defaultFromAddress: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
-    defaultFromName: process.env.EMAIL_FROM_NAME || 'Company Profile',
-    transport: emailTransport,
-    skipVerify: true, // Add this line to skip the connection check
-  }),
+  // Email: AWS SES (prod) or silent JSON transport (dev/fallback)
+  email: buildEmailAdapter(),
 
   // Server URL (required for Payload admin to work correctly)
   serverURL: payloadServerUrl,

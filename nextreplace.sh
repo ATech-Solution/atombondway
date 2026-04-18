@@ -49,6 +49,12 @@ npm install
 echo "skip 🏗️ Building app... make sure already on local and pass .nextjs"
 #npm run build
 
+echo "🔧 Patching dev-machine paths in standalone bundle..."
+# Next.js bakes import.meta.url absolute paths at build time (e.g. Payload's OG font loader).
+# Replace the build machine's path with this server's path so runtime file reads succeed.
+grep -rl "/Users/tansams/Documents/GitHub/atombondway" .next/standalone/ --include="*.js" 2>/dev/null \
+  | xargs -r sed -i "s|/Users/tansams/Documents/GitHub/atombondway|/home/deploy/atombondway|g"
+
 echo "📂 Copying static assets into standalone bundle..."
 cp -r public .next/standalone/public
 cp -r .next/static .next/standalone/.next/static
