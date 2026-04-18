@@ -49,10 +49,14 @@ npm install
 echo "skip 🏗️ Building app... make sure already on local and pass .nextjs"
 #npm run build
 
+echo "📂 Copying static assets into standalone bundle..."
+cp -r public .next/standalone/public
+cp -r .next/static .next/standalone/.next/static
+
 echo "🔄 Restarting app..."
-pm2 stop company-profile
-pm2 delete company-profile
-pm2 start npm --name "company-profile" -- start
+pm2 stop company-profile || true
+pm2 delete company-profile || true
+pm2 start ecosystem.config.js --env production
 pm2 restart company-profile --update-env
 
 echo "✅ Deployed successfully!"

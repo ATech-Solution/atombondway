@@ -9,8 +9,8 @@ module.exports = {
   apps: [
     {
       name: 'company-profile',
-      script: './node_modules/.bin/next',
-      args: 'start',
+      script: 'node',
+      args: '.next/standalone/server.js',
       cwd: '/home/deploy/atombondway/',       // Change to your deployment path
       instances: 1,                  // Must be 1 for SQLite
       exec_mode: 'fork',             // Must be fork (not cluster) for SQLite
@@ -20,6 +20,7 @@ module.exports = {
       env_production: {
         NODE_ENV: 'production',
         PORT: 3000,
+        HOSTNAME: '0.0.0.0',
       },
     },
   ],

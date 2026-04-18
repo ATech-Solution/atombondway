@@ -20,6 +20,14 @@ const mediaHostname = mediaBaseUrl
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // Ensure Payload's OG font and config files are traced into the standalone bundle
+  outputFileTracingIncludes: {
+    '/api/og': ['./node_modules/@payloadcms/next/dist/routes/rest/og/**'],
+    '/(payload)/admin/[[...segments]]': [
+      './node_modules/@payloadcms/next/dist/**',
+      './payload.config.ts',
+    ],
+  },
   turbopack: {},
   productionBrowserSourceMaps: false,
   sassOptions: {
