@@ -21,6 +21,7 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3000,
         HOSTNAME: '0.0.0.0',
+        DATABASE_URL: 'file:/home/deploy/atombondway/data/payload.db',
       },
     },
   ],

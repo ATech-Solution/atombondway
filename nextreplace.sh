@@ -35,6 +35,11 @@ mkdir -p /home/deploy/atombondway/public/media
 sudo chown -R deploy:deploy /home/deploy/atombondway/public/media
 sudo chmod 755 /home/deploy/atombondway/public/media
 
+# data/ — must exist and be writable for SQLite (payload.db lives here)
+mkdir -p /home/deploy/atombondway/data
+sudo chown deploy:deploy /home/deploy/atombondway/data
+sudo chmod 750 /home/deploy/atombondway/data
+
 echo "📦 Pulling latest code..."
 #cd ~/atombondway
 git stash
