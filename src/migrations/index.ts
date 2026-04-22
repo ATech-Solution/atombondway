@@ -16,6 +16,7 @@ import * as migration_20260410_133740_newsetupss from './20260410_133740_newsetu
 import * as migration_20260410_154600_newsetupsss from './20260410_154600_newsetupsss';
 import * as migration_20260414_085630_newfield from './20260414_085630_newfield';
 import * as migration_20260414_095410_newfields from './20260414_095410_newfields';
+import * as migration_20260422_122724_new from './20260422_122724_new';
 
 export const migrations = [
   {
@@ -106,6 +107,11 @@ export const migrations = [
   {
     up: migration_20260414_095410_newfields.up,
     down: migration_20260414_095410_newfields.down,
-    name: '20260414_095410_newfields'
+    name: '20260414_095410_newfields',
+  },
+  {
+    up: migration_20260422_122724_new.up,
+    down: migration_20260422_122724_new.down,
+    name: '20260422_122724_new'
   },
 ];
