@@ -26,7 +26,7 @@ const buildVerifyEmailHTML = (user: User, token: string): string => {
 }
 
 const buildResetPasswordEmailHTML = (token: string, serverUrl: string): string => {
-  const url = `${serverUrl}/admin/reset-password?token=${token}`
+  const url = `${serverUrl}/reset-password?token=${token}`
   return `
     <!DOCTYPE html>
     <html>

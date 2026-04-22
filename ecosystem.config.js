@@ -29,8 +29,8 @@ module.exports = {
         // payload.config.ts reads these at runtime to build serverURL and allowedOrigins
         // (CORS/CSRF). Without them, serverURL defaults to http://localhost:3000, which
         // causes CSRF rejection for every admin panel API request and breaks the admin UI.
-        NEXT_PUBLIC_SITE_URL_PROD: 'https://dev.atombondway.com',
-        PAYLOAD_PUBLIC_SERVER_URL_PROD: 'https://dev.atombondway.com',
+        NEXT_PUBLIC_SITE_URL_PROD: 'https://atombondway.com',
+        PAYLOAD_PUBLIC_SERVER_URL_PROD: 'https://atombondway.com',
       },
     },
   ],

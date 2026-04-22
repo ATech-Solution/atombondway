@@ -26,7 +26,7 @@ export const config = {
   // - /maintenance  (Under-construction page — always reachable)
   // - Static files with extensions
   matcher: [
-    '/((?!admin|api|_next/static|_next/image|media|images|maintenance|favicon.ico|robots.txt|sitemap.xml|\\..*).+)',
+    '/((?!admin|api|_next/static|_next/image|media|images|maintenance|reset-password|favicon.ico|robots.txt|sitemap.xml|\\..*).+)',
     '/',
   ],
 }

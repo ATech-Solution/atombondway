@@ -1,0 +1,86 @@
+# ============================================================
+# MAINTENANCE MODE
+# Set to "true" to show the under-construction page to all visitors.
+# Admin panel (/admin) and API (/api) remain accessible.
+# ============================================================
+MAINTENANCE_MODE=false
+
+# ============================================================
+# APPLICATION
+# ============================================================
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL_DEV=http://localhost:3000
+NEXT_PUBLIC_SITE_URL_PROD=https://atombondway.com
+NODE_ENV=production
+#production or development (default: development)
+# ============================================================
+# PAYLOAD CMS
+# Generate a strong secret: openssl rand -base64 32
+# ============================================================
+PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
+PAYLOAD_PUBLIC_SERVER_URL_DEV=http://localhost:3000
+PAYLOAD_PUBLIC_SERVER_URL_PROD=https://atombondway.com
+PAYLOAD_SECRET=9a53f76e1108f288f6717bea779733dff1ab967b7fe298d9ba1f6cb438387fce
+# ============================================================
+# SITE DOMAIN (used for SEO canonical URLs)
+# ============================================================
+NEXT_PUBLIC_DOMAIN=http://localhost:3000
+NEXT_PUBLIC_DOMAIN_DEV=http://localhost:3000
+NEXT_PUBLIC_DOMAIN_PROD=https://atombondway.com
+
+# ============================================================
+# DATABASE (SQLite)
+# Format: file:./data/payload.db  (relative from project root)
+# On production VPS use an absolute path:
+#   file:/var/www/compro/data/payload.db
+# ============================================================
+#DATABASE_URL=file:./data/payload.db
+DATABASE_URL=file:/home/deploy/atombondway/data/payload.db
+
+# ============================================================
+# MEDIA STORAGE (Production Deployment)
+# Configure where uploaded media files are stored.
+# Leave blank to default to {PROJECT_ROOT}/public/media
+# On production with persistent volume:
+#   PAYLOAD_MEDIA_DIR=/home/deploy/atombondway/public/media
+# ============================================================
+PAYLOAD_MEDIA_DIR=/home/deploy/atombondway/public/media
+
+# ============================================================
+# MEDIA URL (Optional, for separate CDN or media server)
+# Set if media is served from a different domain than the main site.
+# Leave blank to use same URL as NEXT_PUBLIC_SITE_URL
+# Example: https://cdn.example.com (for CDN-served media)
+# ============================================================
+#NEXT_PUBLIC_MEDIA_URL=/home/deploy/atombondway/public/media
+
+# ============================================================
+# EMAIL - AWS SES (Production)
+# Leave AWS_SES_SMTP_USER blank to fall back to Mailpit (dev)
+# ============================================================
+AWS_SES_SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+AWS_SES_SMTP_PORT=465
+AWS_SES_SMTP_USER=
+AWS_SES_SMTP_PASSWORD=
+EMAIL_FROM=noreply@atombondway.com
+EMAIL_FROM_NAME=Atombondway
+# AWS_SES_SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+# AWS_SES_SMTP_PORT=465
+# AWS_SES_SMTP_USER=AKIAUQUCCF6GRGXO5JJI
+# AWS_SES_SMTP_PASSWORD=BAuB8Opv6iWp4nFMn/gGN2S849xkOKxfqqJgNxBWY7MN
+# EMAIL_FROM=noreply@atombondway.com
+# EMAIL_FROM_NAME=Atombondway
+
+# ============================================================
+# EMAIL - Mailpit (Local Development / Fallback)
+# Run Mailpit: docker run -p 1025:1025 -p 8025:8025 axllent/mailpit
+# View emails at: http://localhost:8025
+# ============================================================
+MAILPIT_HOST=localhost
+MAILPIT_PORT=1025
+
+# ============================================================
+# SITE DOMAIN (used for SEO canonical URLs)
+# ============================================================
+NEXT_PUBLIC_DOMAIN=https://atombondway.com
+

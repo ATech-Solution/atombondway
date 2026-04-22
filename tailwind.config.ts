@@ -8,6 +8,7 @@ const config: Config = {
     // './src/app/layout.tsx',
     // IMPORTANT: Only target your frontend, NOT the entire 'app' folder
     './src/app/(frontend)/**/*.{js,ts,jsx,tsx}', // ONLY target frontend
+    './src/app/reset-password/**/*.{js,ts,jsx,tsx}', // reset-password page (outside route groups)
     './src/components/**/*.{js,ts,jsx,tsx}',
     // Deliberately excludes src/app/(payload)/** — Payload Admin uses its own styles
   ],
