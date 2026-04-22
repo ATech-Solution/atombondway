@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e  # stop script if any command fails
+#set -e  # stop script if any command fails
 
 #echo "🔍 Checking server health..."
 #FREE_MEM=$(free -m | awk '/^Mem:/{print $4}')
