@@ -31,6 +31,13 @@ module.exports = {
         // causes CSRF rejection for every admin panel API request and breaks the admin UI.
         NEXT_PUBLIC_SITE_URL_PROD: 'https://atombondway.com',
         PAYLOAD_PUBLIC_SERVER_URL_PROD: 'https://atombondway.com',
+        NEXT_PUBLIC_DOMAIN_PROD: 'https://atombondway.com',
+        AWS_SES_SMTP_HOST: 'email-smtp.ap-southeast-1.amazonaws.com',
+        AWS_SES_SMTP_PORT: '465',
+        AWS_SES_SMTP_USER: 'AKIAUQUCCF6GRGXO5JJI',
+        AWS_SES_SMTP_PASSWORD: 'BAuB8Opv6iWp4nFMn/gGN2S849xkOKxfqqJgNxBWY7MN',
+        EMAIL_FROM: 'noreply@atombondway.com',
+        EMAIL_FROM_NAME: 'Atombondway',
       },
     },
   ],

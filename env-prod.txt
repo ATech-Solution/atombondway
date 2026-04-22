@@ -58,13 +58,13 @@ PAYLOAD_MEDIA_DIR=/home/deploy/atombondway/public/media
 # EMAIL - AWS SES (Production)
 # Leave AWS_SES_SMTP_USER blank to fall back to Mailpit (dev)
 # ============================================================
-AWS_SES_SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+AWS_SES_SMTP_HOST=email-smtp.ap-southeast-1.amazonaws.com
 AWS_SES_SMTP_PORT=465
 AWS_SES_SMTP_USER=
 AWS_SES_SMTP_PASSWORD=
 EMAIL_FROM=noreply@atombondway.com
 EMAIL_FROM_NAME=Atombondway
-# AWS_SES_SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+# AWS_SES_SMTP_HOST=email-smtp.ap-southeast-1.amazonaws.com
 # AWS_SES_SMTP_PORT=465
 # AWS_SES_SMTP_USER=AKIAUQUCCF6GRGXO5JJI
 # AWS_SES_SMTP_PASSWORD=BAuB8Opv6iWp4nFMn/gGN2S849xkOKxfqqJgNxBWY7MN
@@ -83,4 +83,3 @@ MAILPIT_PORT=1025
 # SITE DOMAIN (used for SEO canonical URLs)
 # ============================================================
 NEXT_PUBLIC_DOMAIN=https://atombondway.com
-

@@ -252,7 +252,7 @@ PAYLOAD_SECRET=<generate: openssl rand -base64 32>
 DATABASE_URL=file:/var/www/compro/data/payload.db
 
 # AWS SES (required in production)
-AWS_SES_SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+AWS_SES_SMTP_HOST=email-smtp.ap-southeast-1.amazonaws.com
 AWS_SES_SMTP_PORT=465
 AWS_SES_SMTP_USER=your-ses-smtp-user
 AWS_SES_SMTP_PASSWORD=your-ses-smtp-password
