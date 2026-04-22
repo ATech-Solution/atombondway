@@ -49,10 +49,12 @@ git pull origin main
 #git checkout origin/main -- package.json
 
 echo "📥 Installing dependencies..."
-npm install
+#npm install
 
 echo "skip 🏗️ Building app... make sure already on local and pass .nextjs"
 #npm run build
+
+ npm run generate:types && npm run generate:importmap
 
 echo "🔧 Patching dev-machine paths in standalone bundle..."
 # Next.js bakes import.meta.url absolute paths at build time (e.g. Payload's OG font loader).
