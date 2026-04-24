@@ -1,0 +1,76 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_SITE_URL_PROD: ${{ secrets.NEXT_PUBLIC_SITE_URL_PROD }}
+          NEXT_PUBLIC_DOMAIN_PROD: ${{ secrets.NEXT_PUBLIC_SITE_URL_PROD }}
+          PAYLOAD_PUBLIC_SERVER_URL_PROD: ${{ secrets.NEXT_PUBLIC_SITE_URL_PROD }}
+        run: npm run build
+
+      # Copy .next/static into standalone so the server can serve it
+      - name: Prepare standalone bundle
+        run: |
+          cp -r .next/static .next/standalone/.next/static
+          # Copy public/ but exclude media/ (user uploads live on the server)
+          rsync -a --exclude='media/' public/ .next/standalone/public/
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Upload build to server
+        run: |
+          # Sync the standalone bundle (server, node_modules, .next chunks)
+          rsync -az --delete \
+            --exclude='public/media' \
+            .next/standalone/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/
+
+          # Sync .next/static → inside standalone's .next/
+          rsync -az --delete \
+            .next/static/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/.next/static/
+
+      - name: Copy ecosystem config
+        run: |
+          # Patch cwd, db path, and app name so dev runs as a separate PM2 process
+          sed \
+            -e 's|/home/deploy/atombondway/|/home/deploy/dev/|g' \
+            -e "s|name: 'company-profile'|name: 'company-profile-dev'|g" \
+            ecosystem.config.js > ecosystem.config.dev.js
+          scp ecosystem.config.dev.js \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/ecosystem.config.js
+
+      - name: Restart app with PM2
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /home/deploy/dev
+            pm2 restart company-profile-dev || pm2 start ecosystem.config.js --env production
+            pm2 save
+          EOF
