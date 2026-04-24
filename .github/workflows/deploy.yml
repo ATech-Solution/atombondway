@@ -46,16 +46,15 @@ jobs:
 
       - name: Upload build to server
         run: |
-          # Sync the standalone bundle (server, node_modules, .next chunks)
+          # Ensure destination exists
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            'mkdir -p /home/deploy/dev/.next/standalone'
+
+          # Sync standalone bundle → matches ecosystem.config.js args: '.next/standalone/server.js'
           rsync -az --delete \
             --exclude='public/media' \
             .next/standalone/ \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/
-
-          # Sync .next/static → inside standalone's .next/
-          rsync -az --delete \
-            .next/static/ \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/.next/static/
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/.next/standalone/
 
       - name: Copy ecosystem config
         run: |
