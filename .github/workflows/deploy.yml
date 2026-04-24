@@ -25,9 +25,9 @@ jobs:
       - name: Build
         env:
           NODE_ENV: production
-          NEXT_PUBLIC_SITE_URL_PROD: ${{ secrets.NEXT_PUBLIC_SITE_URL_PROD }}
-          NEXT_PUBLIC_DOMAIN_PROD: ${{ secrets.NEXT_PUBLIC_SITE_URL_PROD }}
-          PAYLOAD_PUBLIC_SERVER_URL_PROD: ${{ secrets.NEXT_PUBLIC_SITE_URL_PROD }}
+          NEXT_PUBLIC_SITE_URL_PROD: ${{ secrets.DEV_SITE_URL }}
+          NEXT_PUBLIC_DOMAIN_PROD: ${{ secrets.DEV_SITE_URL }}
+          PAYLOAD_PUBLIC_SERVER_URL_PROD: ${{ secrets.DEV_SITE_URL }}
         run: npm run build
 
       # Copy .next/static into standalone so the server can serve it
@@ -62,6 +62,8 @@ jobs:
           sed \
             -e 's|/home/deploy/atombondway/|/home/deploy/dev/|g' \
             -e "s|name: 'company-profile'|name: 'company-profile-dev'|g" \
+            -e "s|PORT: 3000|PORT: 3001|g" \
+            -e "s|atombondway.com|dev.atombondway.com|g" \
             ecosystem.config.js > ecosystem.config.dev.js
           scp ecosystem.config.dev.js \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/ecosystem.config.js
