@@ -76,8 +76,15 @@ jobs:
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/ecosystem.config.js
 
       - name: Run migrations & restart PM2
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'bash -l -s' << 'EOF'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            source ~/.profile 2>/dev/null || true
             cd /home/deploy/dev
             export DATABASE_URL="file:/home/deploy/dev/data/payload.db"
             export NODE_ENV=production
@@ -85,4 +92,3 @@ jobs:
             pm2 delete company-profile-dev 2>/dev/null || true
             pm2 start ecosystem.config.js --env production
             pm2 save
-          EOF
