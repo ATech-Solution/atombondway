@@ -46,15 +46,22 @@ jobs:
 
       - name: Upload build to server
         run: |
-          # Ensure destination exists
+          # Ensure persistent directories exist (never deleted by rsync)
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            'mkdir -p /home/deploy/dev/.next/standalone'
+            'mkdir -p /home/deploy/dev/.next/standalone /home/deploy/dev/data /home/deploy/dev/public/media'
 
           # Sync standalone bundle → matches ecosystem.config.js args: '.next/standalone/server.js'
           rsync -az --delete \
             --exclude='public/media' \
             .next/standalone/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/.next/standalone/
+
+      - name: Copy migration files
+        run: |
+          rsync -az src/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/src/
+          scp package.json tsconfig.json payload.config.ts \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/
 
       - name: Copy ecosystem config
         run: |
@@ -68,10 +75,13 @@ jobs:
           scp ecosystem.config.dev.js \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/ecosystem.config.js
 
-      - name: Restart app with PM2
+      - name: Run migrations & restart PM2
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'bash -l -s' << 'EOF'
             cd /home/deploy/dev
+            export DATABASE_URL="file:/home/deploy/dev/data/payload.db"
+            export NODE_ENV=production
+            NODE_OPTIONS='--import tsx' npx payload migrate 2>/dev/null || true
             pm2 delete company-profile-dev 2>/dev/null || true
             pm2 start ecosystem.config.js --env production
             pm2 save
