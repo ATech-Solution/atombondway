@@ -69,8 +69,8 @@ jobs:
 
       - name: Restart app with PM2
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash -lc '
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'bash -l -s' << 'EOF'
             cd /home/deploy/dev
             pm2 restart company-profile-dev || pm2 start ecosystem.config.js --env production
             pm2 save
-          '
+          EOF
