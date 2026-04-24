@@ -18,27 +18,27 @@
 sudo rm -rf .next
 sudo unzip -q next.zip
 sudo mv next .next
-# sudo chown -R deploy:deploy .next
-# sudo chmod -R 755 .next
+# chown -R deploy:deploy .next
+# chmod -R 755 .next
 sudo rm -rf __MACOSX
 
 # # set the permisson for site
 # # Project root — deploy owns everything
-# sudo chown -R deploy:deploy /home/deploy/atombondway
+# chown -R deploy:deploy /home/deploy/atombondway
 # # .next/standalone — needs read + execute to run Node
-# sudo chmod -R 755 /home/deploy/atombondway/.next
+# chmod -R 755 /home/deploy/atombondway/.next
 # # data/ — needs write for SQLite (read/write/lock the .db file)
-# #sudo chmod 750 /home/deploy/atombondway/data
-# #sudo chmod 640 /home/deploy/atombondway/data/payload.db
+# #chmod 750 /home/deploy/atombondway/data
+# #chmod 640 /home/deploy/atombondway/data/payload.db
 # # public/media — must exist and be writable for Payload file uploads
 # mkdir -p /home/deploy/atombondway/public/media
-# sudo chown -R deploy:deploy /home/deploy/atombondway/public/media
-# sudo chmod 755 /home/deploy/atombondway/public/media
+# chown -R deploy:deploy /home/deploy/atombondway/public/media
+# chmod 755 /home/deploy/atombondway/public/media
 
 # # data/ — must exist and be writable for SQLite (payload.db lives here)
 # mkdir -p /home/deploy/atombondway/data
-# sudo chown deploy:deploy /home/deploy/atombondway/data
-# sudo chmod 750 /home/deploy/atombondway/data
+# chown deploy:deploy /home/deploy/atombondway/data
+# chmod 750 /home/deploy/atombondway/data
 
 echo "📦 Pulling latest code..."
 #cd ~/atombondway
@@ -51,10 +51,10 @@ git pull origin main
 echo "📥 Installing dependencies..."
 #npm install
 
-echo "skip 🏗️ Building app... make sure already on local and pass .nextjs"
+echo "skip 🏗️ Building app... make sure already on local and pass .next"
 #npm run build
 
- npm run generate:types && npm run generate:importmap
+npm run generate:types && npm run generate:importmap
 
 # echo "🔧 Patching dev-machine paths in standalone bundle..."
 # # Next.js bakes import.meta.url absolute paths at build time (e.g. Payload's OG font loader).

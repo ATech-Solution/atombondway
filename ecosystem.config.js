@@ -16,7 +16,7 @@ module.exports = {
       exec_mode: 'fork',             // Must be fork (not cluster) for SQLite
       autorestart: true,
       watch: false,
-      max_memory_restart: '1G',
+      max_memory_restart: '2G',
       env_production: {
         NODE_ENV: 'production',
         PORT: 3000,
