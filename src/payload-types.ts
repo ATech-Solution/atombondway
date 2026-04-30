@@ -73,6 +73,7 @@ export interface Config {
     'project-categories': ProjectCategory;
     products: Product;
     'product-categories': ProductCategory;
+    plugins: Plugin;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -85,6 +86,7 @@ export interface Config {
     'project-categories': ProjectCategoriesSelect<false> | ProjectCategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
+    plugins: PluginsSelect<false> | PluginsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -426,6 +428,40 @@ export interface ProductCategory {
   createdAt: string;
 }
 /**
+ * Manage site plugins — enable or disable features.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plugins".
+ */
+export interface Plugin {
+  id: number;
+  name: string;
+  /**
+   * Unique identifier for this plugin. Do not change after creation.
+   */
+  slug: string;
+  description?: string | null;
+  version?: string | null;
+  /**
+   * Enable or disable this plugin.
+   */
+  status: 'active' | 'inactive';
+  /**
+   * Plugin-specific settings as JSON. See plugin documentation for available options.
+   */
+  config?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
@@ -455,6 +491,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'product-categories';
         value: number | ProductCategory;
+      } | null)
+    | ({
+        relationTo: 'plugins';
+        value: number | Plugin;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -671,6 +711,20 @@ export interface ProductCategoriesSelect<T extends boolean = true> {
   slug?: T;
   image?: T;
   description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plugins_select".
+ */
+export interface PluginsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  version?: T;
+  status?: T;
+  config?: T;
   updatedAt?: T;
   createdAt?: T;
 }

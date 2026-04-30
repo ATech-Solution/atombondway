@@ -14,6 +14,8 @@ import { Projects } from './src/payload/collections/Projects.ts'
 import { ProjectCategory } from './src/payload/collections/ProjectCategory.ts'
 import { Products } from './src/payload/collections/Products.ts'
 import { ProductCategory } from './src/payload/collections/ProductCategory.ts'
+import { Plugins } from './src/payload/collections/Plugins.ts'
+import { PLUGIN_METADATA } from './src/plugins/backup-restore/index.ts'
 
 import { Navigation } from './src/payload/globals/Navigation.ts'
 import { SiteSettings } from './src/payload/globals/SiteSettings.ts'
@@ -73,6 +75,30 @@ const buildEmailAdapter = async () => {
   })
 }
 
+async function seedPlugins(payload: Awaited<ReturnType<typeof import('payload').getPayload>>) {
+  try {
+    const existing = await payload.find({
+      collection: 'plugins',
+      where: { slug: { equals: PLUGIN_METADATA.slug } },
+      limit: 1,
+    })
+    if (existing.docs.length === 0) {
+      await payload.create({
+        collection: 'plugins',
+        data: {
+          name: PLUGIN_METADATA.name,
+          slug: PLUGIN_METADATA.slug,
+          description: PLUGIN_METADATA.description,
+          version: PLUGIN_METADATA.version,
+          status: 'inactive',
+        },
+      })
+    }
+  } catch {
+    // Silently skip on first boot before migrations run
+  }
+}
+
 export default buildConfig({
   // Admin panel configuration
   admin: {
@@ -92,6 +118,12 @@ export default buildConfig({
         Logo: '@/components/admin/Logo#AdminLogo',
         Icon: '@/components/admin/Icon#AdminIcon',
       },
+      views: {
+        BackupRestore: {
+          Component: '@/plugins/backup-restore/BackupView#BackupView',
+          path: '/plugins/backup',
+        },
+      },
     },
   },
 
@@ -100,7 +132,7 @@ export default buildConfig({
   csrf: allowedOrigins,
 
   // Collections & Globals
-  collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory],
+  collections: [Users, Media, Projects, ProjectCategory, Products, ProductCategory, Plugins],
   globals: [SiteSettings, Navigation, HomePage, ProductsPage, ProjectsPage, ServicesPage, AboutPage, FooterSettings, CustomCSS],
 
   // Localization: English + Traditional Chinese
@@ -153,5 +185,9 @@ export default buildConfig({
     limits: {
       fileSize: 10_000_000,
     },
+  },
+
+  onInit: async (payload) => {
+    await seedPlugins(payload)
   },
 })

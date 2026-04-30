@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS='--import tsx' payload migrate && next dev",
     "build": "next build",
     "postbuild": "npm run generate:importmap",
     "postinstall": "npm run generate:types && npm run generate:importmap",
@@ -18,9 +18,12 @@
     "clean": "rm -rf .next node_modules",
     "rebuild": "rm -rf .next node_modules && next build",
     "redb": "NODE_OPTIONS='--import tsx' payload migrate:create && NODE_OPTIONS='--import tsx' payload migrate",
-    "regen": "NODE_OPTIONS='--import tsx' payload generate:types && NODE_OPTIONS='--import tsx' payload generate:importmap"
+    "regen": "NODE_OPTIONS='--import tsx' payload generate:types && NODE_OPTIONS='--import tsx' payload generate:importmap",
+    "backup": "node backups/scripts/backup.js",
+    "restore": "node backups/scripts/restore.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1039.0",
     "@payloadcms/db-sqlite": "3.33.0",
     "@payloadcms/email-nodemailer": "3.33.0",
     "@payloadcms/next": "3.33.0",

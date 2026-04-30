@@ -20,7 +20,7 @@ NODE_ENV=production
 PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
 PAYLOAD_PUBLIC_SERVER_URL_DEV=http://localhost:3000
 PAYLOAD_PUBLIC_SERVER_URL_PROD=https://atombondway.com
-PAYLOAD_SECRET=9a53f76e1108f288f6717bea779733dff1ab967b7fe298d9ba1f6cb438387fce
+PAYLOAD_SECRET=hoOqL9lfrG7D+18kcEU1v8mcUT+plfGhqpe3aJ5H58Y=
 # ============================================================
 # SITE DOMAIN (used for SEO canonical URLs)
 # ============================================================
