@@ -1,7 +1,15 @@
 import fs from 'fs'
 import path from 'path'
 import { execSync } from 'child_process'
-import { DB_BACKUPS_DIR, FILES_BACKUPS_DIR, resolveDbPath, resolveMediaDir } from './backup.ts'
+import {
+  DB_BACKUPS_DIR,
+  FILES_BACKUPS_DIR,
+  PROJECT_BACKUPS_DIR,
+  resolveDbPath,
+  resolveMediaDir,
+} from './backup.ts'
+
+const PROJECT_ROOT = path.resolve(process.cwd())
 
 export async function restoreDatabase(backupFileName: string): Promise<void> {
   const backupPath = path.join(DB_BACKUPS_DIR, backupFileName)
@@ -34,4 +42,18 @@ export async function restoreFiles(backupFileName: string): Promise<void> {
   fs.mkdirSync(mediaDir, { recursive: true })
 
   execSync(`tar -xzf "${backupPath}" -C "${parentDir}"`, { stdio: 'pipe' })
+}
+
+// Restore project source files. Deliberately skips .env* files to preserve current secrets.
+export async function restoreProjectFiles(backupFileName: string): Promise<void> {
+  const backupPath = path.join(PROJECT_BACKUPS_DIR, backupFileName)
+  if (!fs.existsSync(backupPath)) {
+    throw new Error(`Project backup not found: ${backupFileName}`)
+  }
+
+  // Extract to project root, skipping .env files to preserve current environment config
+  execSync(
+    `tar -xzf "${backupPath}" -C "${PROJECT_ROOT}" --exclude=".env*" --exclude="*.env"`,
+    { stdio: 'pipe' },
+  )
 }

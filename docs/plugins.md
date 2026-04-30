@@ -5,6 +5,19 @@
 The plugin system lets admins enable or disable optional site features without modifying code.
 Each plugin is a document in the **Plugins** collection in the Payload CMS admin panel.
 
+Active plugins automatically appear as navigation links in the admin sidebar (below the System group).
+
+---
+
+## Plugin Documentation Convention
+
+> **Every plugin must have:**
+> 1. `docs/{plugin-slug}.md` — the primary knowledge doc (structure, features, env vars, API, setup)
+> 2. `src/plugins/{plugin-slug}/CHANGELOG.md` — version log (version, date, title, summary)
+>
+> **Before modifying a plugin:** read its `CHANGELOG.md` to understand the current state.
+> **After modifying a plugin:** update `CHANGELOG.md` and `docs/{plugin-slug}.md`.
+
 ---
 
 ## Managing Plugins
@@ -15,6 +28,7 @@ Each plugin is a document in the **Plugins** collection in the Payload CMS admin
 2. Find the plugin you want to enable
 3. Set **Status** to **Active**
 4. Save
+5. The plugin's admin link appears automatically in the sidebar under **Plugins**
 
 ### Disable a Plugin
 
@@ -36,7 +50,19 @@ Each plugin is a document in the **Plugins** collection in the Payload CMS admin
 | `description` | What this plugin does |
 | `version` | Plugin version string |
 | `status` | `active` or `inactive` |
-| `config` | JSON object with plugin-specific settings |
+| `config` | JSON object with plugin-specific settings. Use `adminPath` to set the sidebar link URL |
+
+### `config.adminPath`
+
+Set this in the plugin document (or via the seed) to control which URL the sidebar nav link points to.
+
+```json
+{
+  "adminPath": "/admin/plugins/backup"
+}
+```
+
+If not set, defaults to `/admin/plugins/{slug}`.
 
 ---
 
@@ -45,13 +71,12 @@ Each plugin is a document in the **Plugins** collection in the Payload CMS admin
 ### Backup & Restore
 
 **Slug:** `backup-restore`  
-**Admin Panel:** Admin → Backup & Restore  
-**Version:** 1.0.0
+**Version:** 2.0.0  
+**Admin Panel:** Admin → Plugins → Backup & Restore  
+**Knowledge doc:** [docs/backup-restore.md](./backup-restore.md)
 
-Creates snapshots of the SQLite database and a compressed archive of all media files.
-Supports optional upload to S3-compatible cloud storage.
-
-See [Backup & Restore Plugin README](../src/plugins/backup-restore/README.md) for full details.
+Creates snapshots of the SQLite database, media files, and project source code.
+Supports local storage and Google Drive (OAuth2). Includes upload, delete, and a built-in restore guide.
 
 ---
 
@@ -62,8 +87,9 @@ See [Backup & Restore Plugin README](../src/plugins/backup-restore/README.md) fo
 ```
 src/plugins/
 └── my-plugin/
-    ├── index.ts         ← metadata export + public API
+    ├── index.ts         ← PLUGIN_METADATA export + public API
     ├── MyView.tsx       ← optional custom admin view (client component)
+    ├── CHANGELOG.md     ← version log (required)
     └── README.md        ← plugin documentation
 ```
 
@@ -133,10 +159,32 @@ onInit: async (payload) => {
         description: 'What this plugin does.',
         version: '1.0.0',
         status: 'inactive',
+        config: { adminPath: '/admin/plugins/my-plugin' },
       },
     })
   }
 }
+```
+
+### 6. Create the knowledge doc
+
+Create `docs/my-plugin.md` with:
+- Overview and features
+- File structure
+- Environment variables
+- API reference
+- Setup instructions
+
+### 7. Create `CHANGELOG.md`
+
+Start the changelog at `src/plugins/my-plugin/CHANGELOG.md`:
+
+```markdown
+## v1.0.0 — YYYY-MM-DD
+
+Initial release.
+- Feature A
+- Feature B
 ```
 
 ---
@@ -157,15 +205,17 @@ src/
     └── backup-restore/
         ├── index.ts
         ├── BackupView.tsx
-        ├── handlers/
-        │   ├── backup.ts
-        │   ├── restore.ts
-        │   └── cloud.ts
-        └── README.md
+        ├── CHANGELOG.md
+        ├── README.md
+        └── handlers/
+            ├── backup.ts
+            ├── restore.ts
+            └── cloud.ts
 
 backups/                            ← backup results (committed folder, ignored content)
 ├── db/                             ← .db snapshots
 ├── files/                          ← .tar.gz archives
+├── project/                        ← project source archives
 ├── scripts/
 │   ├── backup.js                   ← npm run backup
 │   └── restore.js                  ← npm run restore
@@ -176,5 +226,16 @@ src/app/api/plugins/                ← plugin API routes
     ├── run/route.ts
     ├── restore/route.ts
     ├── download/route.ts
-    └── list/route.ts
+    ├── list/route.ts
+    ├── delete/route.ts
+    ├── upload/route.ts
+    └── gdrive/route.ts
+
+docs/                               ← plugin knowledge docs
+├── plugins.md                      ← this file
+└── backup-restore.md               ← Backup & Restore knowledge doc
+
+src/components/admin/
+├── PluginNavLinks.tsx              ← server component: fetches active plugins for sidebar
+└── PluginNavLinksClient.tsx        ← client component: renders nav links with active state
 ```

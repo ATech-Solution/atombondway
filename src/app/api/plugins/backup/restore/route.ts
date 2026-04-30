@@ -2,11 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import path from 'path'
-import { restoreDatabase, restoreFiles } from '@/plugins/backup-restore/handlers/restore'
-import { DB_BACKUPS_DIR, FILES_BACKUPS_DIR } from '@/plugins/backup-restore/handlers/backup'
+import {
+  restoreDatabase,
+  restoreFiles,
+  restoreProjectFiles,
+} from '@/plugins/backup-restore/handlers/restore'
+import {
+  DB_BACKUPS_DIR,
+  FILES_BACKUPS_DIR,
+  PROJECT_BACKUPS_DIR,
+} from '@/plugins/backup-restore/handlers/backup'
 
 function isSafePath(dir: string, fileName: string): boolean {
-  // Prevent path traversal — ensure resolved path stays inside the expected dir
   const resolved = path.resolve(dir, fileName)
   return resolved.startsWith(path.resolve(dir))
 }
@@ -20,18 +27,27 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { dbFile, filesFile } = body as { dbFile?: string; filesFile?: string }
-
-    if (!dbFile && !filesFile) {
-      return NextResponse.json({ error: 'Provide dbFile and/or filesFile to restore.' }, { status: 400 })
+    const { dbFile, filesFile, projectFile } = body as {
+      dbFile?: string
+      filesFile?: string
+      projectFile?: string
     }
 
-    // Validate file names don't contain path traversal
+    if (!dbFile && !filesFile && !projectFile) {
+      return NextResponse.json(
+        { error: 'Provide at least one of: dbFile, filesFile, projectFile' },
+        { status: 400 },
+      )
+    }
+
     if (dbFile && !isSafePath(DB_BACKUPS_DIR, dbFile)) {
       return NextResponse.json({ error: 'Invalid dbFile path.' }, { status: 400 })
     }
     if (filesFile && !isSafePath(FILES_BACKUPS_DIR, filesFile)) {
       return NextResponse.json({ error: 'Invalid filesFile path.' }, { status: 400 })
+    }
+    if (projectFile && !isSafePath(PROJECT_BACKUPS_DIR, projectFile)) {
+      return NextResponse.json({ error: 'Invalid projectFile path.' }, { status: 400 })
     }
 
     const restored: string[] = []
@@ -43,6 +59,10 @@ export async function POST(request: NextRequest) {
     if (filesFile) {
       await restoreFiles(filesFile)
       restored.push(`media files (${filesFile})`)
+    }
+    if (projectFile) {
+      await restoreProjectFiles(projectFile)
+      restored.push(`project files (${projectFile})`)
     }
 
     return NextResponse.json({ success: true, restored })

@@ -23,6 +23,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { AdminIcon as AdminIcon_534076e2c753ea5d539a54b05f456b1b } from '@/components/admin/Icon'
 import { AdminLogo as AdminLogo_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
+import { PluginNavLinks as PluginNavLinks_82342605a718ae4a725e76dfb1903dbc } from '@/components/admin/PluginNavLinks'
 import { BackupView as BackupView_c6e7a50e6de1af8e0aeb53a31782b293 } from '@/plugins/backup-restore/BackupView'
 
 export const importMap = {
@@ -51,5 +52,6 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/admin/Icon#AdminIcon": AdminIcon_534076e2c753ea5d539a54b05f456b1b,
   "@/components/admin/Logo#AdminLogo": AdminLogo_a44df17d0fc3dcd873dae43dc3bf66bd,
+  "@/components/admin/PluginNavLinks#PluginNavLinks": PluginNavLinks_82342605a718ae4a725e76dfb1903dbc,
   "@/plugins/backup-restore/BackupView#BackupView": BackupView_c6e7a50e6de1af8e0aeb53a31782b293
 }

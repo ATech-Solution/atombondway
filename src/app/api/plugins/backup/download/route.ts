@@ -3,7 +3,11 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import fs from 'fs'
 import path from 'path'
-import { DB_BACKUPS_DIR, FILES_BACKUPS_DIR } from '@/plugins/backup-restore/handlers/backup'
+import {
+  DB_BACKUPS_DIR,
+  FILES_BACKUPS_DIR,
+  PROJECT_BACKUPS_DIR,
+} from '@/plugins/backup-restore/handlers/backup'
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,14 +18,18 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const type = searchParams.get('type') as 'db' | 'files' | null
+    const type = searchParams.get('type') as 'db' | 'files' | 'project' | null
     const fileName = searchParams.get('file')
 
-    if (!type || !fileName || !['db', 'files'].includes(type)) {
-      return NextResponse.json({ error: 'Invalid parameters. Requires type=db|files&file=<name>' }, { status: 400 })
+    if (!type || !fileName || !['db', 'files', 'project'].includes(type)) {
+      return NextResponse.json(
+        { error: 'Invalid parameters. Requires type=db|files|project&file=<name>' },
+        { status: 400 },
+      )
     }
 
-    const dir = type === 'db' ? DB_BACKUPS_DIR : FILES_BACKUPS_DIR
+    const dir =
+      type === 'db' ? DB_BACKUPS_DIR : type === 'files' ? FILES_BACKUPS_DIR : PROJECT_BACKUPS_DIR
 
     // Path traversal protection
     const resolved = path.resolve(dir, fileName)
@@ -38,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     return new NextResponse(fileBuffer, {
       headers: {
-        'Content-Type': type === 'db' ? 'application/octet-stream' : 'application/gzip',
+        'Content-Type': 'application/octet-stream',
         'Content-Disposition': `attachment; filename="${baseName}"`,
         'Content-Length': String(fileBuffer.length),
       },

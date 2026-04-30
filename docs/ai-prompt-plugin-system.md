@@ -1,4 +1,4 @@
-# AI Prompt — Install Plugin System + Backup & Restore Plugin
+# AI Prompt — Install Plugin System + Backup & Restore Plugin v2.0
 
 Copy and paste the prompt below into any AI assistant (Claude, ChatGPT, etc.) to install this plugin system into a new Payload CMS 3.x + Next.js 15 project.
 
@@ -19,7 +19,7 @@ Copy and paste the prompt below into any AI assistant (Claude, ChatGPT, etc.) to
 
 ---
 
-I need you to install a **Plugin System + Backup & Restore Plugin** into my existing Payload CMS 3.x + Next.js 15 project. 
+I need you to install a **Plugin System + Backup & Restore Plugin v2.0** into my existing Payload CMS 3.x + Next.js 15 project.
 
 ### Project assumptions (correct me if different)
 - Framework: **Next.js 15** with App Router
@@ -39,131 +39,215 @@ If any of these are different in my project, ask me before proceeding.
 
 #### 1. Plugins Collection — `src/payload/collections/Plugins.ts`
 
-A Payload CMS collection that acts as a plugin registry. Each plugin is a document.
-
 Fields:
 - `name` (text, required) — human-readable plugin name
 - `slug` (text, unique, required, readOnly) — identifier used in code
 - `description` (textarea)
 - `version` (text, default `"1.0.0"`)
 - `status` (select: `active` | `inactive`, default `inactive`) — in sidebar
-- `config` (json) — plugin-specific settings
+- `config` (json) — plugin-specific settings, including `adminPath` for the sidebar link
 
 Access: admin-only for create/update/delete. Editors can read.
 Admin group: `"System"`
 
 ---
 
-#### 2. Backup & Restore Plugin
+#### 2. Admin Sidebar Nav — Active Plugin Links
 
-All plugin code goes in **`src/plugins/backup-restore/`**.
-Backup result files go in a **separate top-level `backups/` folder** (not inside `src/`).
+When a plugin is set to Active, it should automatically appear as a nav link in the admin sidebar (below the System group).
 
-##### File structure to create:
+Create two files:
 
-```
-src/plugins/backup-restore/
-├── index.ts                    ← exports PLUGIN_METADATA + re-exports handlers
-├── BackupView.tsx              ← 'use client' React component for admin panel
-└── handlers/
-    ├── backup.ts               ← backupDatabase(), backupFiles(), listBackups()
-    ├── restore.ts              ← restoreDatabase(), restoreFiles()
-    └── cloud.ts                ← uploadToCloud() — optional S3/R2
+**`src/components/admin/PluginNavLinks.tsx`** — async server component:
+- Receives `payload` from Payload's server props
+- Fetches all active plugins from the Plugins collection
+- Renders `PluginNavLinksClient` with plugin items
+- Each item's href: `plugin.config?.adminPath` OR `/admin/plugins/{slug}`
 
-backups/
-├── db/                         ← .db snapshots (gitignored content)
-├── files/                      ← .tar.gz archives (gitignored content)
-├── scripts/
-│   ├── backup.js               ← standalone Node.js CLI (no compile needed)
-│   └── restore.js              ← interactive CLI with readline prompts
-└── RESTORE.md                  ← step-by-step restore guide
+**`src/components/admin/PluginNavLinksClient.tsx`** — `'use client'` component:
+- Receives `items: { name: string, href: string }[]`
+- Uses `usePathname()` from `next/navigation` for active state
+- Renders links using Payload's nav CSS classes: `nav__group`, `nav__link`, `nav__link-indicator`, `nav__link-label`
+- Import `Link` from `next/link`
 
-src/app/api/plugins/backup/
-├── run/route.ts                ← POST — trigger backup
-├── restore/route.ts            ← POST — restore from backup
-├── download/route.ts           ← GET  — stream file as download
-└── list/route.ts               ← GET  — list backups + plugin status
-
-docs/
-└── plugins.md                  ← full plugin system documentation
-```
-
-##### `handlers/backup.ts` logic:
-- `backupDatabase()`: copies the SQLite `.db` file to `backups/db/payload-{ISO-timestamp}.db`
-- `backupFiles()`: runs `tar -czf backups/files/media-{ISO-timestamp}.tar.gz -C public/ media/`
-- `listBackups()`: reads `backups/db/` and `backups/files/`, returns sorted arrays (newest first)
-- `resolveDbPath()`: reads `DATABASE_URL` env var (strip `file:` prefix), falls back to `./data/payload.db`
-- `resolveMediaDir()`: reads `PAYLOAD_MEDIA_DIR` env var, falls back to `./public/media`
-- Export constants `DB_BACKUPS_DIR` and `FILES_BACKUPS_DIR` for use in API routes
-
-##### `handlers/restore.ts` logic:
-- `restoreDatabase(backupFileName)`: before overwriting, copies current DB to `pre-restore-{ts}.db` snapshot, then `fs.copyFile` the backup over the live DB
-- `restoreFiles(backupFileName)`: runs `tar -xzf {backup} -C public/` to extract
-
-##### `handlers/cloud.ts` logic:
-- `uploadToCloud(filePath)`: dynamic `import('@aws-sdk/client-s3')`, uses env vars:
-  - `BACKUP_S3_ENDPOINT`, `BACKUP_S3_BUCKET`, `BACKUP_S3_KEY`, `BACKUP_S3_SECRET`, `BACKUP_S3_REGION`
-- Returns the cloud URL string on success, `null` if env vars are missing (silent skip)
-
-##### `BackupView.tsx` — custom Payload admin view:
-- `'use client'` React component
-- Sections: status badge, Run Backup button, DB backup history table, Files backup history table
-- Each table row: filename, size (formatted KB/MB), date, Download button, Restore button
-- Restore button shows a confirm modal before calling the API
-- Calls `/api/plugins/backup/list` on mount to load status + history
-- Calls `/api/plugins/backup/run` (POST) on backup button
-- Calls `/api/plugins/backup/restore` (POST) on confirm restore
-- Download opens `/api/plugins/backup/download?type=db|files&file={name}` in new tab
-- Run Backup button is disabled if plugin status is not `active`
-- Style: inline CSS only, no Tailwind (admin panel doesn't use Tailwind)
-
-##### API routes — all require `user.role === 'admin'`:
-Auth pattern for all routes:
+Register in `payload.config.ts`:
 ```typescript
-const payload = await getPayload({ config })
-const { user } = await payload.auth({ headers: request.headers })
-if (!user || user.role !== 'admin') {
-  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+admin: {
+  components: {
+    afterNavLinks: ['@/components/admin/PluginNavLinks#PluginNavLinks'],
+  },
 }
 ```
 
-- `list/route.ts` (GET): reads plugin status from Plugins collection + calls `listBackups()`, returns `{ pluginStatus, backups: { db: [...], files: [...] } }` with size/mtime per file
-- `run/route.ts` (POST): checks plugin is active, calls `backupDatabase()` + `backupFiles()` in parallel, calls `uploadToCloud()` for each, returns `{ success, dbFile, filesFile, cloudUrls, timestamp }`
-- `restore/route.ts` (POST, body `{ dbFile?, filesFile? }`): validates paths with `path.resolve` to prevent path traversal, calls `restoreDatabase()` and/or `restoreFiles()`
-- `download/route.ts` (GET, `?type=db|files&file=<name>`): validates path stays inside `backups/` dir, streams file with `Content-Disposition: attachment`
+---
 
-##### CLI scripts — plain `.js` files, ESM, no build required:
-- `backup.js`: loads `.env` manually, calls same backup logic, prints progress with ✓ checkmarks
-- `restore.js`: uses `readline` to list backups interactively, asks user to pick DB backup + files backup (or skip each), asks for confirmation, runs restore
+#### 3. Backup & Restore Plugin v2.0
+
+All plugin code in **`src/plugins/backup-restore/`**.
+Backup results in a top-level **`backups/`** folder.
+Every plugin requires a `CHANGELOG.md` in its folder and a `docs/{slug}.md` knowledge doc.
+
+##### File structure:
+
+```
+src/plugins/backup-restore/
+├── index.ts
+├── BackupView.tsx
+├── CHANGELOG.md
+├── README.md
+└── handlers/
+    ├── backup.ts
+    ├── restore.ts
+    └── cloud.ts
+
+backups/
+├── db/
+├── files/
+├── project/
+├── scripts/
+│   ├── backup.js
+│   └── restore.js
+└── RESTORE.md
+
+src/app/api/plugins/backup/
+├── run/route.ts
+├── restore/route.ts
+├── download/route.ts
+├── list/route.ts
+├── delete/route.ts
+├── upload/route.ts
+└── gdrive/route.ts
+
+docs/
+├── plugins.md
+└── backup-restore.md
+```
+
+##### `handlers/backup.ts`:
+- `backupDatabase()` — copies SQLite DB to `backups/db/payload-{timestamp}.db`
+- `backupFiles()` — creates `backups/files/media-{timestamp}.tar.gz` of media directory
+- `backupProjectFiles()` — creates `backups/project/project-{timestamp}.tar.gz` of project source, excluding: `.next`, `node_modules`, `backups`, `.git`, `data`, `*.log`, `.DS_Store`, `dist`, `build`, `.cache`
+- `listBackups()` — returns `{ db: string[], files: string[], project: string[] }` newest-first
+- `resolveDbPath()` — reads `DATABASE_URL` env var (strips `file:` prefix), falls back to `data/payload.db`
+- `resolveMediaDir()` — reads `PAYLOAD_MEDIA_DIR` env var, falls back to `public/media`
+- Export `DB_BACKUPS_DIR`, `FILES_BACKUPS_DIR`, `PROJECT_BACKUPS_DIR`, `BACKUPS_DIR`, `getBackupDir(type)`
+
+##### `handlers/restore.ts`:
+- `restoreDatabase(fileName)` — saves pre-restore snapshot, then copies backup over live DB
+- `restoreFiles(fileName)` — extracts tar.gz to parent of media dir
+- `restoreProjectFiles(fileName)` — extracts tar.gz to project root, excludes `.env*` files (preserves secrets)
+
+##### `handlers/cloud.ts`:
+
+S3 (legacy, unchanged):
+- `uploadToCloud(filePath)` — uploads to S3/R2, returns URL or null
+
+Google Drive (OAuth2):
+- `isGoogleDriveConfigured()` — checks if `GOOGLE_DRIVE_CLIENT_ID` + `CLIENT_SECRET` are set
+- `isGoogleDriveConnected()` — checks all three: client ID, secret, refresh token
+- `uploadToGoogleDrive(filePath)` — uploads file to Drive folder, returns `{ id, webViewLink }` or null
+- `listGoogleDriveBackups()` — lists files in Drive folder, returns `DriveFile[]`
+- `deleteGoogleDriveFile(fileId)` — deletes file from Drive
+- `getGoogleDriveDownloadStream(fileId)` — returns Readable stream for proxying downloads
+- `getGoogleOAuthUrl(redirectUri)` — builds OAuth consent URL (no dynamic import needed)
+- `exchangeCodeForTokens(code, redirectUri)` — exchanges auth code for `{ refreshToken, accessToken }`
+
+Uses `googleapis` npm package. Env vars: `GOOGLE_DRIVE_CLIENT_ID`, `GOOGLE_DRIVE_CLIENT_SECRET`, `GOOGLE_DRIVE_REFRESH_TOKEN`, `GOOGLE_DRIVE_FOLDER_ID`.
+
+##### API routes — all require `user.role === 'admin'`:
+
+**`list/route.ts`** (GET):
+- Returns `{ pluginStatus, gdrive: { configured, connected }, backups: [...] }`
+- Backups array: merged local + Google Drive, each entry has `{ name, type, size, mtime, storage, driveId? }`
+- Infer type from filename: `.db` → `db`, `media-*.tar.gz` → `files`, `project-*.tar.gz` → `project`
+
+**`run/route.ts`** (POST, body: `{ scope?: ('db'|'files'|'project')[], destinations?: ('local'|'gdrive')[] }`):
+- Defaults: all scope, local only
+- Run selected handlers in parallel
+- Upload to Google Drive if `gdrive` in destinations
+- Returns `{ success, dbFile?, filesFile?, projectFile?, cloudUrls, driveUrls, timestamp }`
+
+**`restore/route.ts`** (POST, body: `{ dbFile?, filesFile?, projectFile? }`):
+- Path traversal validation for all types
+- Returns `{ success, restored: string[] }`
+
+**`download/route.ts`** (GET, `?type=db|files|project&file=<name>`):
+- Path traversal protection
+- Streams file with `Content-Disposition: attachment`
+
+**`delete/route.ts`** (DELETE, body: `{ type, name, storage, driveId? }`):
+- Local: unlinks file from disk
+- gdrive: calls `deleteGoogleDriveFile(driveId)`
+
+**`upload/route.ts`** (POST, multipart/form-data, field `file`):
+- Detects target subfolder from filename (`.db` → `db/`, `media-*.tar.gz` → `files/`, `project-*.tar.gz` → `project/`)
+- Validates destination stays inside `backups/`
+
+**`gdrive/route.ts`** (GET, `?action=auth|callback|status|download`):
+- `auth` — redirects to Google OAuth consent URL
+- `callback?code=...` — exchanges code, shows HTML page with the refresh token to copy
+- `status` — returns `{ configured, connected }`
+- `download?id=<driveId>&name=<fileName>` — proxies Drive file download
+
+##### `BackupView.tsx` — `'use client'` React component:
+
+Three-section layout with inline CSS only (no Tailwind):
+
+**Section 1 — Backup Controls:**
+- Plugin title + status badge
+- Scope checkboxes: `Database (SQLite)`, `Media Files`, `Project Files`
+- Destination checkboxes: `Save Locally`, `Google Drive` (disabled if not configured; shows Connect link if configured but no token)
+- Run Backup button (disabled when plugin inactive or running)
+- Animated indeterminate progress bar while running
+
+**Section 2 — Backup History:**
+- Unified table: local + Google Drive, newest first
+- Columns: File name (truncated, monospace), Type badge (DB/Media/Project), Date/Time, Storage icon (💾 or G), Size + Download button, Restore button, Delete (🗑) icon
+- Restore shows per-row inline progress bar + confirmation dialog
+- Delete shows confirmation dialog
+- Refresh button
+
+**Section 3 — Upload:**
+- Drag-and-drop zone + file picker (accepts .db, .tar.gz, .zip)
+- Upload progress bar
+- Success/error toast
+
+**Bottom: Restore Guide** (collapsible):
+- Step-by-step restore instructions (stop server, restore, migrate, restart, verify, rollback tip)
+
+State management: plugin status, gdrive status, backups array, running/restoring/deleting/uploading states, confirm dialogs, toast messages.
+
+##### `index.ts`:
+```typescript
+export const PLUGIN_METADATA = {
+  slug: 'backup-restore',
+  name: 'Backup & Restore',
+  description: 'Backup and restore SQLite database, media files, and project source. Supports local storage and Google Drive.',
+  version: '2.0.0',
+} as const
+```
 
 ---
 
-#### 3. Modify `payload.config.ts`
+#### 4. Modify `payload.config.ts`
 
-Add these imports at the top:
+Imports:
 ```typescript
 import { Plugins } from './src/payload/collections/Plugins.ts'
 import { PLUGIN_METADATA } from './src/plugins/backup-restore/index.ts'
 ```
 
-Add `Plugins` to the `collections` array.
-
-Add the admin view to the `admin.components` block:
+Admin components:
 ```typescript
 admin: {
   components: {
-    // ...existing graphics etc...
-    views: {
-      BackupRestore: {
-        Component: '@/plugins/backup-restore/BackupView#BackupView',
-        path: '/plugins/backup',
-      },
-    },
+    // ...graphics, views...
+    afterNavLinks: ['@/components/admin/PluginNavLinks#PluginNavLinks'],
   },
 }
 ```
 
-Add a `seedPlugins` function (before `buildConfig`) and call it from `onInit`:
+Seed function:
 ```typescript
 async function seedPlugins(payload) {
   try {
@@ -181,17 +265,15 @@ async function seedPlugins(payload) {
           description: PLUGIN_METADATA.description,
           version: PLUGIN_METADATA.version,
           status: 'inactive',
+          config: { adminPath: '/admin/plugins/backup' },
         },
       })
     }
   } catch {
-    // Silent on first boot before migrations run
+    // Silent on first boot
   }
 }
-```
 
-Add `onInit` to the config:
-```typescript
 onInit: async (payload) => {
   await seedPlugins(payload)
 },
@@ -199,88 +281,85 @@ onInit: async (payload) => {
 
 ---
 
-#### 4. Update `.gitignore`
+#### 5. Create documentation
 
-Add to `.gitignore`:
-```
-backups/db/*.db
-backups/files/*.tar.gz
-```
+**`docs/backup-restore.md`** — plugin knowledge doc:
+- Overview, file structure, env vars table, Google Drive setup steps, API reference, backup file naming, project backup exclusions, restore notes, admin panel UI description, portability checklist
 
-Create placeholder files so the empty folders are committed:
-- `backups/db/.gitkeep`
-- `backups/files/.gitkeep`
+**`docs/plugins.md`** — plugin system overview:
+- Managing plugins (enable/disable), plugin doc convention (docs/{slug}.md + CHANGELOG.md), available plugins list, creating a new plugin (7 steps), security notes, folder structure
+
+**`src/plugins/backup-restore/CHANGELOG.md`** — version history starting at v1.0.0
+
+**`src/plugins/backup-restore/README.md`** — quick start, env vars table, API table, backup locations
+
+**`backups/RESTORE.md`** — step-by-step server restore guide:
+1. Prerequisites
+2. Download backup file
+3. Stop server (`pm2 stop ecosystem.config.js`)
+4. Restore (Option A: admin panel, Option B: CLI `npm run restore`, Option C: manual commands)
+5. Verify schema (`npm run migrate`)
+6. Reinstall dependencies if project restore
+7. Restart server
+8. Verify site
+9. Rollback instructions (`pre-restore-*.db` location)
 
 ---
 
-#### 5. Update `package.json`
+#### 6. Update `.gitignore`
 
-Add to `scripts`:
+Add:
+```
+backups/db/*.db
+backups/files/*.tar.gz
+backups/project/*.tar.gz
+```
+
+Create `.gitkeep` files:
+- `backups/db/.gitkeep`
+- `backups/files/.gitkeep`
+- `backups/project/.gitkeep`
+
+---
+
+#### 7. Update `package.json`
+
+Scripts:
 ```json
 "backup": "node backups/scripts/backup.js",
 "restore": "node backups/scripts/restore.js"
 ```
 
-Add to `dependencies`:
+Dependencies:
 ```json
-"@aws-sdk/client-s3": "^3.0.0"
+"@aws-sdk/client-s3": "^3.0.0",
+"googleapis": "^150.0.0"
 ```
-
----
-
-#### 6. Create `backups/RESTORE.md`
-
-A step-by-step restore guide covering:
-1. Prerequisites
-2. Stop the server (PM2: `pm2 stop ecosystem.config.js`)
-3. Run `npm run restore` (interactive) OR manual copy commands
-4. Run `npm run migrate` to verify schema
-5. Restart server (`pm2 start ecosystem.config.js`)
-6. Verification steps (check admin login, check media URLs)
-7. Rollback: the `pre-restore-*.db` file location
-
----
-
-#### 7. Create `docs/plugins.md`
-
-Document covering:
-- What the Plugins collection is
-- How to enable/disable a plugin in the admin panel
-- How to create a new plugin (folder structure, metadata export, admin view registration, API route pattern, seeding)
-- Security notes (admin-only guards, path traversal protection)
-- Full folder structure reference
 
 ---
 
 ### After implementation
 
-Run these commands in order:
 ```bash
 npm install
-npm run generate:types     # regenerate Payload types to include 'plugins' slug
-npm run build              # verify no TypeScript errors
-npm run migrate            # create the plugins table in SQLite
+npm run generate:types
+npm run generate:importmap
+npm run build
+npm run migrate
 ```
 
 Then:
-1. Open `/admin` → **System → Plugins** — the Backup & Restore plugin will be auto-created as Inactive
-2. Set it to **Active**
-3. Visit `/admin/plugins/backup` to use the backup panel
+1. Open `/admin` → **System → Plugins** — Backup & Restore is auto-created as Inactive
+2. Set it to **Active** and save
+3. The plugin link appears in the sidebar under **Plugins**
+4. Click it → `/admin/plugins/backup`
+5. For Google Drive: add `GOOGLE_DRIVE_CLIENT_ID` + `GOOGLE_DRIVE_CLIENT_SECRET` to `.env`, restart, then click **Connect →** and follow the OAuth flow
 
 ---
 
-### Optional cloud upload
+### Optional: CLI scripts
 
-Add to `.env` to enable S3/R2 cloud upload after each backup:
-```env
-BACKUP_S3_ENDPOINT=https://<account>.r2.cloudflarestorage.com
-BACKUP_S3_BUCKET=my-backups-bucket
-BACKUP_S3_KEY=your-access-key-id
-BACKUP_S3_SECRET=your-secret-access-key
-BACKUP_S3_REGION=auto
-```
-
-Cloud upload is silently skipped if these vars are absent.
+Create `backups/scripts/backup.js` and `backups/scripts/restore.js` — plain ESM `.js` files that manually load `.env` and call the same backup/restore logic. These run without building the Next.js app.
 
 ---
 
@@ -290,8 +369,6 @@ Cloud upload is silently skipped if these vars are absent.
 
 ## Notes for adaptation
 
-When pasting into a different project, check:
-
 | Thing to verify | Why it matters |
 |----------------|---------------|
 | User `role` field values | API routes check `user.role === 'admin'` |
@@ -300,17 +377,16 @@ When pasting into a different project, check:
 | `@/` alias target | Must point to `src/` |
 | Payload config filename | Some projects use `payload.config.ts` at root, others inside `src/` |
 | PM2 config name | Restore guide references `ecosystem.config.js` — update if different |
-| `@payloadcms/db-sqlite` vs Postgres | If using Postgres, swap the DB backup from file-copy to `pg_dump` |
+| `@payloadcms/db-sqlite` vs Postgres | If using Postgres, swap DB backup from file-copy to `pg_dump` |
+| Google Drive redirect URI | Must match exactly what's registered in Google Cloud Console |
 
 ---
 
 ## For Postgres projects
 
-If the target project uses PostgreSQL instead of SQLite, replace the `backupDatabase()` logic with:
+Replace `backupDatabase()` in `handlers/backup.ts`:
 
 ```typescript
-import { execSync } from 'child_process'
-
 export async function backupDatabase(): Promise<string> {
   const dest = path.join(DB_BACKUPS_DIR, `payload-${isoTimestamp()}.sql.gz`)
   const dbUrl = process.env.DATABASE_URL || ''
@@ -319,7 +395,7 @@ export async function backupDatabase(): Promise<string> {
 }
 ```
 
-And restore with:
+Restore with:
 ```bash
 gunzip -c backup.sql.gz | psql "$DATABASE_URL"
 ```

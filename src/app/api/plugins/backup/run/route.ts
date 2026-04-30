@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { backupDatabase, backupFiles } from '@/plugins/backup-restore/handlers/backup'
-import { uploadToCloud } from '@/plugins/backup-restore/handlers/cloud'
+import { backupDatabase, backupFiles, backupProjectFiles } from '@/plugins/backup-restore/handlers/backup'
+import { uploadToCloud, uploadToGoogleDrive } from '@/plugins/backup-restore/handlers/cloud'
+
+type Scope = 'db' | 'files' | 'project'
+type Destination = 'local' | 'gdrive'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,19 +29,57 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const [dbFile, filesFile] = await Promise.all([backupDatabase(), backupFiles()])
+    let body: { scope?: Scope[]; destinations?: Destination[] } = {}
+    try {
+      body = await request.json()
+    } catch {
+      // No body — use defaults
+    }
 
-    // Attempt cloud upload (no-op if env vars not set)
-    const [dbCloud, filesCloud] = await Promise.all([
-      uploadToCloud(dbFile),
-      uploadToCloud(filesFile),
+    const scope: Scope[] = body.scope?.length ? body.scope : ['db', 'files', 'project']
+    const destinations: Destination[] = body.destinations?.length ? body.destinations : ['local']
+
+    // Run all selected backup types in parallel
+    const [dbFile, filesFile, projectFile] = await Promise.all([
+      scope.includes('db') ? backupDatabase() : Promise.resolve(null),
+      scope.includes('files') ? backupFiles() : Promise.resolve(null),
+      scope.includes('project') ? backupProjectFiles() : Promise.resolve(null),
     ])
+
+    const cloudUrls: Record<string, string | null> = {}
+    const driveUrls: Record<string, { id: string; webViewLink: string } | null> = {}
+
+    // Cloud uploads (S3 — legacy, runs if env vars set)
+    if (destinations.includes('local')) {
+      const uploads = await Promise.all([
+        dbFile ? uploadToCloud(dbFile) : null,
+        filesFile ? uploadToCloud(filesFile) : null,
+        projectFile ? uploadToCloud(projectFile) : null,
+      ])
+      if (dbFile) cloudUrls.db = uploads[0]
+      if (filesFile) cloudUrls.files = uploads[1]
+      if (projectFile) cloudUrls.project = uploads[2]
+    }
+
+    // Google Drive uploads
+    if (destinations.includes('gdrive')) {
+      const driveUploads = await Promise.all([
+        dbFile ? uploadToGoogleDrive(dbFile) : null,
+        filesFile ? uploadToGoogleDrive(filesFile) : null,
+        projectFile ? uploadToGoogleDrive(projectFile) : null,
+      ])
+      if (dbFile) driveUrls.db = driveUploads[0]
+      if (filesFile) driveUrls.files = driveUploads[1]
+      if (projectFile) driveUrls.project = driveUploads[2]
+    }
 
     return NextResponse.json({
       success: true,
-      dbFile,
-      filesFile,
-      cloudUrls: { db: dbCloud, files: filesCloud },
+      dbFile: dbFile ? dbFile.split('/').pop() : null,
+      filesFile: filesFile ? filesFile.split('/').pop() : null,
+      projectFile: projectFile ? projectFile.split('/').pop() : null,
+      cloudUrls,
+      driveUrls,
       timestamp: new Date().toISOString(),
     })
   } catch (err) {

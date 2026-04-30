@@ -6,10 +6,12 @@ const PROJECT_ROOT = path.resolve(process.cwd())
 export const BACKUPS_DIR = path.join(PROJECT_ROOT, 'backups')
 export const DB_BACKUPS_DIR = path.join(BACKUPS_DIR, 'db')
 export const FILES_BACKUPS_DIR = path.join(BACKUPS_DIR, 'files')
+export const PROJECT_BACKUPS_DIR = path.join(BACKUPS_DIR, 'project')
 
 function ensureDirs() {
   fs.mkdirSync(DB_BACKUPS_DIR, { recursive: true })
   fs.mkdirSync(FILES_BACKUPS_DIR, { recursive: true })
+  fs.mkdirSync(PROJECT_BACKUPS_DIR, { recursive: true })
 }
 
 function isoTimestamp(): string {
@@ -49,7 +51,36 @@ export async function backupFiles(): Promise<string> {
   return dest
 }
 
-export function listBackups(): { db: string[]; files: string[] } {
+// Backup project source files, excluding build artifacts and runtime folders
+export async function backupProjectFiles(): Promise<string> {
+  ensureDirs()
+  const ts = isoTimestamp()
+  const dest = path.join(PROJECT_BACKUPS_DIR, `project-${ts}.tar.gz`)
+
+  // Folders to exclude from the project backup
+  const excludes = [
+    '.next',
+    'node_modules',
+    'backups',
+    '.git',
+    'data',
+    '*.log',
+    '.DS_Store',
+    'dist',
+    'build',
+    '.cache',
+  ]
+    .map((e) => `--exclude="${e}"`)
+    .join(' ')
+
+  execSync(`tar -czf "${dest}" ${excludes} -C "${PROJECT_ROOT}" .`, {
+    stdio: 'pipe',
+  })
+
+  return dest
+}
+
+export function listBackups(): { db: string[]; files: string[]; project: string[] } {
   ensureDirs()
   const readDir = (dir: string, ext: string) =>
     fs.existsSync(dir)
@@ -62,13 +93,21 @@ export function listBackups(): { db: string[]; files: string[] } {
   return {
     db: readDir(DB_BACKUPS_DIR, '.db'),
     files: readDir(FILES_BACKUPS_DIR, '.tar.gz'),
+    project: readDir(PROJECT_BACKUPS_DIR, '.tar.gz'),
   }
 }
 
-export function getBackupFileStat(type: 'db' | 'files', fileName: string) {
-  const dir = type === 'db' ? DB_BACKUPS_DIR : FILES_BACKUPS_DIR
+export function getBackupFileStat(type: 'db' | 'files' | 'project', fileName: string) {
+  const dir =
+    type === 'db' ? DB_BACKUPS_DIR : type === 'files' ? FILES_BACKUPS_DIR : PROJECT_BACKUPS_DIR
   const filePath = path.join(dir, fileName)
   if (!fs.existsSync(filePath)) return null
   const stat = fs.statSync(filePath)
   return { size: stat.size, mtime: stat.mtime }
+}
+
+export function getBackupDir(type: 'db' | 'files' | 'project'): string {
+  if (type === 'db') return DB_BACKUPS_DIR
+  if (type === 'files') return FILES_BACKUPS_DIR
+  return PROJECT_BACKUPS_DIR
 }

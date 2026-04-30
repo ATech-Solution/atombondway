@@ -159,3 +159,4 @@ next.zip
 # Backup content (keep folder structure, ignore actual backup files)
 backups/db/*.db
 backups/files/*.tar.gz
+backups/project/*.tar.gz

@@ -3,7 +3,17 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import fs from 'fs'
 import path from 'path'
-import { listBackups, DB_BACKUPS_DIR, FILES_BACKUPS_DIR } from '@/plugins/backup-restore/handlers/backup'
+import {
+  listBackups,
+  DB_BACKUPS_DIR,
+  FILES_BACKUPS_DIR,
+  PROJECT_BACKUPS_DIR,
+} from '@/plugins/backup-restore/handlers/backup'
+import {
+  listGoogleDriveBackups,
+  isGoogleDriveConfigured,
+  isGoogleDriveConnected,
+} from '@/plugins/backup-restore/handlers/cloud'
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,20 +23,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { db, files } = listBackups()
+    const { db, files, project } = listBackups()
 
-    const toEntries = (dir: string, names: string[]) =>
+    const toEntries = (dir: string, names: string[], type: 'db' | 'files' | 'project') =>
       names.map((name) => {
         const filePath = path.join(dir, name)
         try {
           const stat = fs.statSync(filePath)
-          return { name, size: stat.size, mtime: stat.mtime.toISOString() }
+          return {
+            name,
+            type,
+            size: stat.size,
+            mtime: stat.mtime.toISOString(),
+            storage: 'local' as const,
+          }
         } catch {
-          return { name, size: 0, mtime: '' }
+          return { name, type, size: 0, mtime: '', storage: 'local' as const }
         }
       })
 
-    // Check plugin status from Plugins collection
+    // Check plugin status
     let pluginStatus = 'unknown'
     try {
       const result = await payload.find({
@@ -41,15 +57,57 @@ export async function GET(request: NextRequest) {
       pluginStatus = 'unknown'
     }
 
+    // Merge local backups
+    const localBackups = [
+      ...toEntries(DB_BACKUPS_DIR, db, 'db'),
+      ...toEntries(FILES_BACKUPS_DIR, files, 'files'),
+      ...toEntries(PROJECT_BACKUPS_DIR, project, 'project'),
+    ].sort((a, b) => (b.mtime > a.mtime ? 1 : -1))
+
+    // Google Drive backups (if connected)
+    let driveBackups: {
+      name: string
+      type: 'db' | 'files' | 'project' | 'unknown'
+      size: number
+      mtime: string
+      storage: 'gdrive'
+      driveId: string
+      webViewLink: string
+    }[] = []
+
+    if (isGoogleDriveConnected()) {
+      const driveFiles = await listGoogleDriveBackups()
+      driveBackups = driveFiles.map((f) => ({
+        name: f.name,
+        type: inferTypeFromName(f.name),
+        size: f.size,
+        mtime: f.createdTime,
+        storage: 'gdrive' as const,
+        driveId: f.id,
+        webViewLink: f.webViewLink,
+      }))
+    }
+
     return NextResponse.json({
       pluginStatus,
-      backups: {
-        db: toEntries(DB_BACKUPS_DIR, db),
-        files: toEntries(FILES_BACKUPS_DIR, files),
+      gdrive: {
+        configured: isGoogleDriveConfigured(),
+        connected: isGoogleDriveConnected(),
       },
+      backups: [...localBackups, ...driveBackups].sort((a, b) =>
+        b.mtime > a.mtime ? 1 : -1,
+      ),
     })
   } catch (err) {
     console.error('[Backup] List error:', err)
     return NextResponse.json({ error: 'Failed to list backups' }, { status: 500 })
   }
+}
+
+function inferTypeFromName(name: string): 'db' | 'files' | 'project' | 'unknown' {
+  if (name.endsWith('.db') || name.startsWith('payload-') || name.startsWith('pre-restore-'))
+    return 'db'
+  if (name.startsWith('media-')) return 'files'
+  if (name.startsWith('project-')) return 'project'
+  return 'unknown'
 }

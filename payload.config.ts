@@ -91,6 +91,7 @@ async function seedPlugins(payload: Awaited<ReturnType<typeof import('payload').
           description: PLUGIN_METADATA.description,
           version: PLUGIN_METADATA.version,
           status: 'inactive',
+          config: { adminPath: '/admin/plugins/backup' },
         },
       })
     }
@@ -124,6 +125,7 @@ export default buildConfig({
           path: '/plugins/backup',
         },
       },
+      afterNavLinks: ['@/components/admin/PluginNavLinks#PluginNavLinks'],
     },
   },
 
