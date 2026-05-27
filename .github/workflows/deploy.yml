@@ -50,6 +50,17 @@ jobs:
           scp ecosystem.config.dev.js \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/ecosystem.config.js
 
+          # Upload local DB to server only if server DB is missing or empty
+          # (protects server data on subsequent deploys)
+          if ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              'test -s /home/deploy/dev/data/payload.db' 2>/dev/null; then
+            echo "Server DB exists — skipping DB upload"
+          else
+            echo "Server DB missing or empty — uploading local DB..."
+            scp data/payload.db \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/data/payload.db
+          fi
+
       - name: Build & deploy on server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -86,6 +97,8 @@ jobs:
 
             echo "=== Running migrations ==="
             export DATABASE_URL="file:/home/deploy/dev/data/payload.db"
+            # Remove push-mode marker (batch=-1) — causes prompts to silently exit(0) in CI
+            sqlite3 data/payload.db "DELETE FROM payload_migrations WHERE batch = -1;" 2>/dev/null || true
             npm run migrate || { echo "ERROR: npm run migrate failed"; exit 1; }
 
             echo "=== Verifying DB schema ==="
