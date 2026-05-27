@@ -20,6 +20,14 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies on runner
+        run: npm ci
+
       - name: Patch ecosystem config for dev
         run: |
           sed \
@@ -50,6 +58,12 @@ jobs:
           scp ecosystem.config.dev.js \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/ecosystem.config.js
 
+          # Sync node_modules from runner to server — npm runs on the runner (7GB RAM),
+          # not on the memory-constrained server
+          echo "=== Syncing node_modules to server ==="
+          rsync -az --delete node_modules/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/node_modules/
+
           # Upload local DB to server only if server DB is missing or empty
           # (protects server data on subsequent deploys)
           if ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
@@ -74,22 +88,6 @@ jobs:
             source ~/.profile 2>/dev/null || true
 
             cd /home/deploy/dev
-
-            echo "=== Adding swap if needed ==="
-            if ! swapon --show 2>/dev/null | grep -q .; then
-              sudo fallocate -l 1G /swapfile 2>/dev/null \
-                && sudo chmod 600 /swapfile \
-                && sudo mkswap /swapfile \
-                && sudo swapon /swapfile \
-                && echo "1G swap added" \
-                || echo "Swap setup skipped (no sudo or already configured)"
-            else
-              echo "Swap already active: $(swapon --show --noheadings | awk '{print $1, $4}')"
-            fi
-
-            echo "=== Installing dependencies ==="
-            # npm install reuses existing node_modules between deploys (avoids OOM from full clean reinstall)
-            npm install --prefer-offline || npm install
 
             echo "=== Generating Payload types ==="
             npm run generate:types
