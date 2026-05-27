@@ -75,8 +75,21 @@ jobs:
 
             cd /home/deploy/dev
 
+            echo "=== Adding swap if needed ==="
+            if ! swapon --show 2>/dev/null | grep -q .; then
+              sudo fallocate -l 1G /swapfile 2>/dev/null \
+                && sudo chmod 600 /swapfile \
+                && sudo mkswap /swapfile \
+                && sudo swapon /swapfile \
+                && echo "1G swap added" \
+                || echo "Swap setup skipped (no sudo or already configured)"
+            else
+              echo "Swap already active: $(swapon --show --noheadings | awk '{print $1, $4}')"
+            fi
+
             echo "=== Installing dependencies ==="
-            npm ci
+            # npm install reuses existing node_modules between deploys (avoids OOM from full clean reinstall)
+            npm install --prefer-offline || npm install
 
             echo "=== Generating Payload types ==="
             npm run generate:types
