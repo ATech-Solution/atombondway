@@ -35,7 +35,13 @@ jobs:
         run: npm run generate:importmap
 
       - name: Build Next.js
-        run: mkdir -p data && npm run build
+        run: |
+          mkdir -p data && npm run build
+          # Standalone server does process.chdir(__dirname) on startup, so it looks for
+          # static files at .next/standalone/.next/static/ and public files at
+          # .next/standalone/public/ — copy them in before rsyncing to server.
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public/. .next/standalone/public/
         env:
           NODE_ENV: production
           DATABASE_URL: file:./data/payload.db
