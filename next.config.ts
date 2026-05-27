@@ -19,6 +19,7 @@ const mediaHostname = mediaBaseUrl
   : null
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['payload', '@payloadcms/db-sqlite', 'image-size', 'nodemailer', 'sharp'],
   output: 'standalone',
   // Payload OG route loads roboto-regular.woff via fs.readFile at runtime.
   // The font isn't a JS import so Next.js file tracing misses it — include it explicitly.
