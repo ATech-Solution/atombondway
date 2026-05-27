@@ -27,7 +27,6 @@ jobs:
             -e "s|name: 'company-profile'|name: 'company-profile-dev'|g" \
             -e "s|PORT: 3000|PORT: 3001|g" \
             -e "s|atombondway.com|dev.atombondway.com|g" \
-            -e "s|EMAIL_FROM_NAME: 'Atombondway',|EMAIL_FROM_NAME: 'Atombondway',\n        PAYLOAD_DB_PUSH: 'true',|" \
             ecosystem.config.js > ecosystem.config.dev.js
 
       - name: Upload source to server
@@ -85,16 +84,21 @@ jobs:
             rsync -az /home/deploy/atombondway/src/migrations/ src/migrations/
 
             echo "=== Syncing DB from production ==="
-            # Use sqlite3 online backup — safe even if prod is being written to
-            rm -f data/payload.db data/payload.db-shm data/payload.db-wal
-            sqlite3 /home/deploy/atombondway/data/payload.db ".backup data/payload.db"
+            # Only replace dev DB if sqlite3 is available AND prod DB exists
+            if command -v sqlite3 >/dev/null 2>&1 && [ -f /home/deploy/atombondway/data/payload.db ]; then
+              rm -f data/payload.db data/payload.db-shm data/payload.db-wal
+              sqlite3 /home/deploy/atombondway/data/payload.db ".backup data/payload.db"
+              echo "DB synced from production"
+            else
+              echo "sqlite3 not available or prod DB missing — keeping existing dev DB (will run migrations below)"
+            fi
 
             echo "=== Syncing media from production ==="
             rsync -a /home/deploy/atombondway/public/media/ public/media/
 
-            echo "=== Running any pending migrations ==="
+            echo "=== Running migrations ==="
             export DATABASE_URL="file:/home/deploy/dev/data/payload.db"
-            npm run migrate || echo "No pending migrations"
+            npm run migrate
 
             echo "=== Restarting PM2 ==="
             pm2 delete company-profile-dev 2>/dev/null || true
