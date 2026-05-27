@@ -160,4 +160,7 @@ src/app/.DS_Store
 src/.DS_Store
 public/.DS_Store
 next.zip
+data/payload.db
+data/payload.db-shm
+data/payload.db-wal
 data/payload.db copy
