@@ -75,6 +75,7 @@ jobs:
 
             echo "=== Building Next.js ==="
             export NODE_ENV=production
+            export DATABASE_URL="file:/home/deploy/dev/data/payload.db"
             export NEXT_PUBLIC_SITE_URL_PROD=https://dev.atombondway.com
             export NEXT_PUBLIC_DOMAIN_PROD=https://dev.atombondway.com
             export PAYLOAD_PUBLIC_SERVER_URL_PROD=https://dev.atombondway.com
