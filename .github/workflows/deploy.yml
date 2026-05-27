@@ -101,8 +101,42 @@ jobs:
             export DATABASE_URL="file:/home/deploy/dev/data/payload.db"
             npm run migrate
 
+            echo "=== Verifying DB schema ==="
+            DB_OK=true
+            if command -v sqlite3 >/dev/null 2>&1 && [ -f data/payload.db ]; then
+              echo "DB tables:"
+              sqlite3 data/payload.db ".tables"
+              echo "projects_locales check:"
+              sqlite3 data/payload.db "SELECT COUNT(*) FROM projects_locales;" 2>/dev/null || { echo "MISSING: projects_locales — will rebuild DB"; DB_OK=false; }
+              echo "payload_migrations applied:"
+              sqlite3 data/payload.db "SELECT name FROM payload_migrations ORDER BY name;" 2>/dev/null || { echo "MISSING: payload_migrations table"; DB_OK=false; }
+            else
+              echo "sqlite3 not available — skipping schema verification"
+            fi
+
+            if [ "$DB_OK" = "false" ]; then
+              echo "=== DB schema incomplete — rebuilding from migrations ==="
+              rm -f data/payload.db data/payload.db-shm data/payload.db-wal
+              npm run migrate
+              echo "DB rebuilt. Tables:"
+              sqlite3 data/payload.db ".tables" 2>/dev/null || echo "sqlite3 unavailable"
+            fi
+
             echo "=== Restarting PM2 ==="
             pm2 delete company-profile-dev 2>/dev/null || true
             pm2 start ecosystem.config.js --env production
             pm2 save
+
+            echo "=== Waiting for server startup ==="
+            sleep 8
+
+            echo "=== Health check ==="
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/api/projects 2>/dev/null || echo "000")
+            echo "GET /api/projects → HTTP $HTTP_STATUS"
+            if [ "$HTTP_STATUS" != "200" ]; then
+              echo "WARNING: Server health check failed (expected 200, got $HTTP_STATUS)"
+              echo "PM2 logs (last 30 lines):"
+              pm2 logs company-profile-dev --lines 30 --nostream 2>/dev/null || echo "Could not get PM2 logs"
+            fi
+
             echo "=== Deploy complete ==="
