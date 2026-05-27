@@ -83,6 +83,17 @@ jobs:
           rsync -az --delete node_modules/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/node_modules/
 
+          # Upload media files if server has none (one-time bootstrap)
+          MEDIA_COUNT=$(ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            'ls /home/deploy/dev/public/media/ 2>/dev/null | wc -l')
+          if [ "$MEDIA_COUNT" = "0" ]; then
+            echo "=== Server has no media — uploading initial media files ==="
+            rsync -az public/media/ \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/deploy/dev/public/media/
+          else
+            echo "Server has $MEDIA_COUNT media file(s) — skipping initial upload"
+          fi
+
           # Upload local DB only if server DB is missing or empty
           if ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
               'test -s /home/deploy/dev/data/payload.db' 2>/dev/null; then
@@ -109,8 +120,15 @@ jobs:
 
             cd /home/deploy/dev
 
-            echo "=== Syncing media from production ==="
-            rsync -a /home/deploy/atombondway/public/media/ public/media/ 2>/dev/null || echo "Media sync skipped (production media unavailable)"
+            echo "=== Syncing new media from production ==="
+            # standalone server.js does chdir(__dirname), so media may be in either location
+            if rsync -a /home/deploy/atombondway/.next/standalone/public/media/ public/media/ 2>/dev/null; then
+              echo "Media synced from production (standalone path)"
+            elif rsync -a /home/deploy/atombondway/public/media/ public/media/ 2>/dev/null; then
+              echo "Media synced from production (regular path)"
+            else
+              echo "Media sync skipped (production media unavailable)"
+            fi
 
             echo "=== Running migrations ==="
             export DATABASE_URL="file:/home/deploy/dev/data/payload.db"
