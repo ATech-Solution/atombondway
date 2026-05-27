@@ -120,7 +120,7 @@ export default buildConfig({
       url: process.env.DATABASE_URL || `file:${path.resolve(dirname, './data/payload.db')}`,
     },
     migrationDir: path.resolve(dirname, './src/migrations'),
-    push: false,
+    push: process.env.PAYLOAD_DB_PUSH === 'true',
   }),
 
   // Rich text editor

@@ -27,6 +27,7 @@ jobs:
             -e "s|name: 'company-profile'|name: 'company-profile-dev'|g" \
             -e "s|PORT: 3000|PORT: 3001|g" \
             -e "s|atombondway.com|dev.atombondway.com|g" \
+            -e "s|EMAIL_FROM_NAME: 'Atombondway',|EMAIL_FROM_NAME: 'Atombondway',\n        PAYLOAD_DB_PUSH: 'true',|" \
             ecosystem.config.js > ecosystem.config.dev.js
 
       - name: Upload source to server
@@ -80,10 +81,13 @@ jobs:
             export PAYLOAD_PUBLIC_SERVER_URL_PROD=https://dev.atombondway.com
             npm run build
 
+            echo "=== Copying migration files from production ==="
+            rsync -az /home/deploy/atombondway/src/migrations/ src/migrations/
+
             echo "=== Syncing DB from production ==="
-            cp /home/deploy/atombondway/data/payload.db data/payload.db
-            cp /home/deploy/atombondway/data/payload.db-shm data/payload.db-shm 2>/dev/null || true
-            cp /home/deploy/atombondway/data/payload.db-wal data/payload.db-wal 2>/dev/null || true
+            # Use sqlite3 online backup — safe even if prod is being written to
+            rm -f data/payload.db data/payload.db-shm data/payload.db-wal
+            sqlite3 /home/deploy/atombondway/data/payload.db ".backup data/payload.db"
 
             echo "=== Syncing media from production ==="
             rsync -a /home/deploy/atombondway/public/media/ public/media/
